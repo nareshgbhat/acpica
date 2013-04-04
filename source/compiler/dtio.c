@@ -498,7 +498,7 @@ DtGetNextLine (
     UINT32                  State = DT_NORMAL_TEXT;
     UINT32                  CurrentLineOffset;
     UINT32                  i;
-    char                    c;
+    int                     c;
 
 
     for (i = 0; ;)
@@ -512,7 +512,7 @@ DtGetNextLine (
             UtExpandLineBuffers ();
         }
 
-        c = (char) getc (Handle);
+        c = getc (Handle);
         if (c == EOF)
         {
             switch (State)
