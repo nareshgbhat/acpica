@@ -1434,6 +1434,14 @@ AtInitTest0007(void)
 
     for (i = 0; i < RMax; i++)
     {
+        /*
+         * Reset controls statistic, this prevents influence statistic from
+         * previous loop round.
+         */
+        OsxfCtrlInit();
+        OsxfUpdateCallsMark();
+        OsxfCtrlGetDiff(TOTAL_STAT);
+
         Status = AcpiInitializeSubsystem();
         if (ACPI_FAILURE(Status))
         {
@@ -1473,7 +1481,7 @@ AtInitTest0007(void)
             /*
              * Check the total number of AcpiOS* invocations
              */
-            Status = AtTerminateCtrlCheck(AE_OK, TOTAL_STAT);
+            Status = AtTerminateCtrlCheck(AE_OK, SYS_STAT & ~OSINIT_STAT);
             if (ACPI_FAILURE(Status))
             {
                 return (Status);
