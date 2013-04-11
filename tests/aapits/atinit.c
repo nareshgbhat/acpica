@@ -1256,25 +1256,12 @@ Init_NO_MEMORY_Test1(
     UINT32              TFst2,
     UINT32              Check)
 {
-    ACPI_STATUS         Status;
-
     /*
      * AcpiOsAllocate returns NULL permanently since the specified call
      */
-    Status = AtInitTermCommonTest(OSXF_NUM(AcpiOsAllocate),
-        AtActD_Permanent, AtActRet_NULL, TFst1, Check,
-        AE_NO_MEMORY);
-    if (ACPI_FAILURE(Status))
-    {
-        return (Status);
-    }
-
-    /*
-     * AcpiOsAllocate returns NULL one time on the specified call
-     */
     return (AtInitTermCommonTest(OSXF_NUM(AcpiOsAllocate),
-        AtActD_OneTime, AtActRet_NULL, TFst2, Check,
-        AE_NO_MEMORY));
+            AtActD_Permanent, AtActRet_NULL, TFst1, Check,
+            AE_NO_MEMORY));
 }
 
 ACPI_STATUS
