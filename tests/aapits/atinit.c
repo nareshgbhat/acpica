@@ -1410,9 +1410,9 @@ AtInitTest0006(void)
         }
 
         /*
-         * Check the total number of AcpiOS* invocations
+         * Check if AcpiOS* invocations were succeed
          */
-        Status = OsxfCtrlCheck(TOTAL_STAT, 1);
+        Status = OsxfCtrlCheck(SYS_STAT, 1);
         if (ACPI_FAILURE(Status))
         {
             AapiErrors++;

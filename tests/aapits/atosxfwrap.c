@@ -65,7 +65,7 @@ AcpiOsTerminate (void)
     if (!OsInitialized)
     {
         printf("AcpiOsTerminate: OSL has not been initialized\n");
-//        return (AE_ERROR);
+        return (AE_ERROR);
     }
 
 #ifdef ACPI_DBG_TRACK_ALLOCATIONS
