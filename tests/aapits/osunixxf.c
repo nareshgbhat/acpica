@@ -669,7 +669,7 @@ AcpiOsActualCreateLock (
     return (AcpiOsCreateSemaphore (1, 1, OutHandle));
 }
 
-void
+ACPI_STATUS
 AcpiOsActualDeleteLock (
     ACPI_HANDLE             Handle)
 {
