@@ -580,8 +580,9 @@ AcpiOsActualCreateSemaphore (
     ACPI_HANDLE         *OutHandle)
 {
 
+    *OutHandle = (ACPI_HANDLE) malloc ((size_t) sizeof(ACPI_HANDLE));
+    OsxfCtrlAddQueue(*OutHandle);
 
-    *OutHandle = (ACPI_HANDLE) 1;
     return (AE_OK);
 }
 
@@ -602,7 +603,7 @@ AcpiOsActualDeleteSemaphore (
     ACPI_HANDLE         Handle)
 {
 
-    if (!Handle)
+    if (!Handle || !OsxfCtrlDelQueue(Handle))
     {
         return (AE_BAD_PARAMETER);
     }
@@ -673,7 +674,7 @@ ACPI_STATUS
 AcpiOsActualDeleteLock (
     ACPI_HANDLE             Handle)
 {
-    AcpiOsDeleteSemaphore (Handle);
+    return (AcpiOsDeleteSemaphore (Handle));
 }
 
 
