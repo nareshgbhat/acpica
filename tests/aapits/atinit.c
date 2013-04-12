@@ -1556,7 +1556,7 @@ AtInitTest0010(void)
         Check_Flags &= ~CHECK_FREE_COND;
     }
     return (AtInitTermCommonTest(OSXF_NUM(AcpiOsTotal),
-        AtActD_OneTime, AtActRet_ERROR, 1,
+        AtActD_Permanent, AtActRet_ERROR, 1,
         Check_Flags, AE_ERROR));
 }
 
