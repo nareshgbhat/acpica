@@ -1513,7 +1513,7 @@ AtInitTest0009(void)
     if (Test_Flags & MALLOC_STAT)
     {
         Status = Init_NO_MEMORY_Test1(1, 1,
-            CHECK_INIT_COND | CHECK_TERM_ACT | CHECK_FREE_COND);
+            CHECK_INIT_COND | CHECK_TERM_ACT);
         if (ACPI_FAILURE(Status))
         {
             return (Status);
@@ -1523,7 +1523,7 @@ AtInitTest0009(void)
     if (Test_Flags & LOCK_STAT)
     {
         Status = Init_NO_MEMORY_Test2(1, 1,
-            CHECK_INIT_COND | CHECK_TERM_ACT | CHECK_FREE_COND);
+            CHECK_INIT_COND | CHECK_TERM_ACT);
         if (ACPI_FAILURE(Status))
         {
             return (Status);
@@ -1533,7 +1533,7 @@ AtInitTest0009(void)
     if (Test_Flags & SEMAPH_STAT)
     {
         Status = Init_NO_MEMORY_Test3(1, 1,
-            CHECK_INIT_COND | CHECK_TERM_ACT | CHECK_FREE_COND);
+            CHECK_INIT_COND | CHECK_TERM_ACT);
         if (ACPI_FAILURE(Status))
         {
             return (Status);
