@@ -412,4 +412,7 @@ OsxfCtrlAddQueue(void *Addr);
 BOOLEAN
 OsxfCtrlDelQueue(void *Addr);
 
+BOOLEAN
+OsxfCtrlCheckQueue(void *Addr);
+
 #endif /* _ATOSXFCTRL */
