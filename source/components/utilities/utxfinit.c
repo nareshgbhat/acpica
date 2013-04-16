@@ -295,6 +295,14 @@ AcpiEnableSubsystem (
      * initialization control methods are run (_REG, _STA, _INI) on the
      * entire namespace.
      */
+
+    /* Make sure events are not already initialized */
+
+    if (AcpiGbl_EventsInitialized == TRUE)
+    {
+        return_ACPI_STATUS (AE_ALREADY_EXISTS);
+    }
+
     if (!(Flags & ACPI_NO_EVENT_INIT))
     {
         ACPI_DEBUG_PRINT ((ACPI_DB_EXEC,
