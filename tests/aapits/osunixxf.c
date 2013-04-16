@@ -580,7 +580,8 @@ AcpiOsActualCreateSemaphore (
     ACPI_HANDLE         *OutHandle)
 {
 
-    *OutHandle = (ACPI_HANDLE) malloc ((size_t) sizeof(ACPI_HANDLE));
+    *OutHandle = (ACPI_HANDLE) malloc ((size_t) sizeof(UINT32));
+    memset(*OutHandle, 0, sizeof(UINT32));
     OsxfCtrlAddQueue(*OutHandle);
 
     return (AE_OK);
@@ -607,6 +608,7 @@ AcpiOsActualDeleteSemaphore (
     {
         return (AE_BAD_PARAMETER);
     }
+    free(Handle);
 
     return (AE_OK);
 }
@@ -633,6 +635,16 @@ AcpiOsActualWaitSemaphore (
     UINT16              Timeout)
 {
 
+    if (!Handle || !OsxfCtrlCheckQueue(Handle))
+    {
+        return (AE_BAD_PARAMETER);
+    }
+
+    if (*(UINT32 *)Handle == 1)
+    {
+        return (AE_TIME);
+    }
+    *(UINT32 *)Handle = 1;
 
     return (AE_OK);
 }
@@ -657,6 +669,12 @@ AcpiOsActualSignalSemaphore (
     UINT32              Units)
 {
 
+    if (!Handle || !OsxfCtrlCheckQueue(Handle))
+    {
+        return (AE_BAD_PARAMETER);
+    }
+
+    *(UINT32 *)Handle = 0;
 
     return (AE_OK);
 }
