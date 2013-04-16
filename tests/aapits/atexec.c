@@ -165,7 +165,7 @@ AtTbInitGenericAddress (
 
     NewGasStruct->Address = Address;
     NewGasStruct->SpaceId = ACPI_ADR_SPACE_SYSTEM_IO;
-    NewGasStruct->BitWidth = BitWidth;
+    NewGasStruct->BitWidth = ACPI_MUL_8 (BitWidth);
     NewGasStruct->BitOffset = 0;
     NewGasStruct->AccessWidth = 0;
 }
@@ -484,21 +484,21 @@ AtBuildLocalFADT2 (
     LocalFADT->Gpe1Base = 96;
 
     LocalFADT->Pm1EventLength = 4;
-    LocalFADT->Pm1ControlLength = 4;
+    LocalFADT->Pm1ControlLength = 2;
     LocalFADT->Pm2ControlLength = 1; /* optional */
-    LocalFADT->PmTimerLength = 8;
+    LocalFADT->PmTimerLength = 4;
 
     /*
      * Convert the addresses to V2.0 GAS structures
      */
 
-    AtTbInitGenericAddress (&LocalFADT->XGpe0Block, 0,
-                             (ACPI_PHYSICAL_ADDRESS)   0x12340000);
-    AtTbInitGenericAddress (&LocalFADT->XGpe1Block, 0,
-                             (ACPI_PHYSICAL_ADDRESS)   0x56780000);
+    AtTbInitGenericAddress (&LocalFADT->XGpe0Block, LocalFADT->Gpe0BlockLength,
+                             (ACPI_PHYSICAL_ADDRESS)   0xC0);
+    AtTbInitGenericAddress (&LocalFADT->XGpe1Block, LocalFADT->Gpe1BlockLength,
+                             (ACPI_PHYSICAL_ADDRESS)   0xE0);
 
     AtTbInitGenericAddress (&LocalFADT->XPm1aEventBlock, LocalFADT->Pm1EventLength,
-                             (ACPI_PHYSICAL_ADDRESS)   0x1aaa0000);
+                             (ACPI_PHYSICAL_ADDRESS)   0xF0);
     AtTbInitGenericAddress (&LocalFADT->XPm1bEventBlock, LocalFADT->Pm1EventLength,
                              (ACPI_PHYSICAL_ADDRESS)   0);
     AtTbInitGenericAddress (&LocalFADT->XPm1aControlBlock, LocalFADT->Pm1ControlLength,
