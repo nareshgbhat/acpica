@@ -575,7 +575,9 @@ typedef UINT64                          ACPI_INTEGER;
  * Initialization state
  */
 #define ACPI_SUBSYSTEM_INITIALIZE       0x01
-#define ACPI_INITIALIZED_OK             0x02
+#define ACPI_LOAD_TABLE                 0x02
+#define ACPI_SUBSYSTEM_ENABLE           0x04
+#define ACPI_INITIALIZED_OK             0x08
 
 /*
  * Power state values
