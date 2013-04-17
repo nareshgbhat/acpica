@@ -197,7 +197,6 @@ ExecuteTest (
     TestSkipped = 0;
     TestPass = 0;
     AtAMLcodeFileName = NULL;
-    AtAMLcodeFileDir = NULL;
     NullBldTask = ZeroBldTask;
 
     OsxfCtrlInit();
