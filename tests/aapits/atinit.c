@@ -3296,7 +3296,7 @@ AtInitializationHandlerCommon(
     UINT32                  StagesScale = 0;
     UINT32                  i, j;
     UINT32                  Stages[3] = {
-        AAPITS_INITIALIZE_SS, AAPITS_LOADTABLES, AAPITS_ENABLE_SS};
+        AAPITS_INI_PRELOAD, AAPITS_LOADTABLES, AAPITS_ENABLE_SS};
 
     if (ACPI_FAILURE(Status = AtAMLcodeFileNameSet(AmlName)))
     {
@@ -3453,7 +3453,7 @@ AtInitTest0048(void)
     UINT32                  StagesScale = 0;
     UINT32                  i, j;
     UINT32                  Stages[3] = {
-        AAPITS_INITIALIZE_SS, AAPITS_LOADTABLES, AAPITS_ENABLE_SS};
+        AAPITS_INI_PRELOAD, AAPITS_LOADTABLES, AAPITS_ENABLE_SS};
 
     if (ACPI_FAILURE(Status = AtAMLcodeFileNameSet("init0032.aml")))
     {
@@ -3531,7 +3531,7 @@ AtInitTest0048(void)
             return (Status);
         }
 
-        if (ACPI_FAILURE(Status = AtInitializationHandlerCallsCheck(5)))
+        if (ACPI_FAILURE(Status = AtInitializationHandlerCallsCheck(8)))
         {
             return (Status);
         }
