@@ -391,6 +391,11 @@ AcpiInstallInitializationHandler (
     UINT32                  Function)
 {
 
+    if (!(AcpiGbl_StartupFlags & ACPI_SUBSYSTEM_INITIALIZE))
+    {
+        return (AE_ERROR);
+    }
+
     if (!Handler)
     {
         return (AE_BAD_PARAMETER);
