@@ -4248,7 +4248,7 @@ AtInitTest0060(void)
     }
 
     Status = AcpiLoadTables();
-    if (ACPI_FAILURE(Status))
+    if (Status != AE_NO_ACPI_TABLES)
     {
         AapiErrors++;
         printf ("API error: AcpiLoadTables() returned %s\n",
@@ -4257,7 +4257,7 @@ AtInitTest0060(void)
     }
 
     Status = AcpiEnableSubsystem(0);
-    if (Status != AE_NO_ACPI_TABLES)
+    if (Status != AE_ERROR)
     {
         AapiErrors++;
         printf ("API error: AcpiEnableSubsystem () returned %s, expected %s\n",
