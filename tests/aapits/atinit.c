@@ -1193,7 +1193,7 @@ AtExceptionCommonTest(
             }
         }
 
-        Status = AtTerminateCtrlCheck(AE_OK, ALL_STAT);
+        Status = AtTerminateCtrlCheck(AE_OK, ALL_STAT & ~MALLOC_STAT);
         if (ACPI_FAILURE(Status))
         {
             return (Status);
