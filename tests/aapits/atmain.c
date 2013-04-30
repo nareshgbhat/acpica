@@ -286,6 +286,7 @@ main(
     UINT32                  test_num;
     UINT32                  i;
     UINT32                  j;
+    int                     status;
 
 
     signal (SIGINT, AtSigHandler);
@@ -335,7 +336,7 @@ main(
         AtAMLcodeFileDir = argv[3];
     }
 
-    ExecuteTest (test_case, test_num);
-    return (0);
+    status = ExecuteTest (test_case, test_num);
+    return (status);
 
 }
