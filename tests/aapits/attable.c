@@ -60,11 +60,6 @@ AtTableTest0000(void)
     ACPI_STATUS             Status;
     ACPI_STATUS             Benchmark = AE_BAD_PARAMETER;
 
-    if (AT_SKIP_FIND_ROOT_PPOINTER_CHECK) {
-        TestSkipped++;
-        printf ("Skip: AcpiFindRootPointer(NULL) results in a crash\n");
-        return (AE_OK);
-    }
     Status = AcpiFindRootPointer(NULL);
     if (Status != Benchmark)
     {
