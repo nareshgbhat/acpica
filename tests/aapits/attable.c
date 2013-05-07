@@ -529,18 +529,6 @@ AtTableTest0008(void)
         return (AE_ERROR);
     }
 
-    /*
-     * Check the total number of AcpiOS* invocations
-     */
-    Status = OsxfCtrlCheck(TOTAL_STAT, 1);
-    if (ACPI_FAILURE(Status))
-    {
-        AapiErrors++;
-        printf ("API Error 2: AcpiOS* calls during AcpiInitializeTables, %s\n",
-            AcpiFormatException(Status));
-        return (Status);
-    }
-
     return (AE_OK);
 }
 
@@ -570,7 +558,13 @@ AtTableTest0009(void)
         return (Status);
     }
 
-    Status = AtInitializeTables(FALSE);
+    Status = AtInitCommonTest(AAPITS_INITIALIZE_SS, 0, 0, 0, 0, NULL);
+    if (ACPI_FAILURE(Status))
+    {
+        return (Status);
+    }
+
+    Status = AcpiInitializeTables(NULL, 20, FALSE);
     if (ACPI_FAILURE(Status))
     {
         AapiErrors++;
@@ -588,18 +582,6 @@ AtTableTest0009(void)
             AcpiFormatException(Status),
             AcpiFormatException(Benchmark));
         return (AE_ERROR);
-    }
-
-    /*
-     * Check the total number of AcpiOS* invocations
-     */
-    Status = OsxfCtrlCheck(TOTAL_STAT, 1);
-    if (ACPI_FAILURE(Status))
-    {
-        AapiErrors++;
-        printf ("API Error 2: AcpiOS* calls during AcpiInitializeTables, %s\n",
-            AcpiFormatException(Status));
-        return (Status);
     }
 
     return (AE_OK);
