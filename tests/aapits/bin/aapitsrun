@@ -109,24 +109,24 @@ do
 		test_ret=$?
 		if [ $test_ret -eq 0 ]; then
 			tests_pass=$[ tests_pass + 1 ]
-			echo "test $test_case $test: pass"
+			echo "test ${TESTS_ORDER[$test_case]} $test: pass"
 		elif [ $test_ret -eq 1 ]; then
 			tests_skip1=$[ tests_skip1 + 1 ]
-			echo "test $test_case $test: skip"
+			echo "test ${TESTS_ORDER[$test_case]} $test: skip"
 		elif [ $test_ret -eq 2 ]; then
 			tests_skip2=$[ tests_skip2 + 1 ]
-			echo "test $test_case $test: fail"
+			echo "test ${TESTS_ORDER[$test_case]} $test: fail"
 		elif [ $test_ret -eq 3 ]; then
 			tests_fail=$[ tests_fail + 1 ]
-			echo "test $test_case $test: fail"
+			echo "test ${TESTS_ORDER[$test_case]} $test: fail"
 		elif [ $test_ret -eq 4 ]; then
 			tests_none=$[ tests_none + 1 ]
-			echo "test $test_case $test: unknown"
+			echo "test ${TESTS_ORDER[$test_case]} $test: unknown"
 		else
 			tests_fault=$[ tests_fault + 1 ]
 		fi
-		echo "test $test_case $test: $test_ret" >> $AAPITSSUM
-		echo "test $test_case $test: $test_ret" >> $AAPITSOUT
+		echo "test ${TESTS_ORDER[$test_case]} $test: $test_ret" >> $AAPITSSUM
+		echo "test ${TESTS_ORDER[$test_case]} $test: $test_ret" >> $AAPITSOUT
 		echo "" >> $AAPITSOUT
 	done
 
