@@ -1042,18 +1042,6 @@ AtLoadTablesInvalidTest(int Var)
         }
     }
 
-    /*
-     * Check the total number of AcpiOS* invocations
-     */
-    Status = OsxfCtrlCheck(TOTAL_STAT, 1);
-    if (ACPI_FAILURE(Status))
-    {
-        AapiErrors++;
-        printf ("API Error 4: AcpiOS* calls during AcpiLoadTables, %s\n",
-            AcpiFormatException(Status));
-        return (Status);
-    }
-
     return (AE_OK);
 }
 
