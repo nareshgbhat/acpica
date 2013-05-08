@@ -913,6 +913,14 @@ AtTableTest0016(void)
     ACPI_STATUS             Status;
     ACPI_TABLE_HEADER       UserTableStructure, *UserTable = &UserTableStructure;
 
+    Status = AtSubsystemInit(
+        (AAPITS_INI_PRELOAD & ~AAPITS_INITABLES),
+        0, 0, NULL);
+    if (ACPI_FAILURE(Status))
+    {
+        return (Status);
+    }
+
     memset(&UserTableStructure, 0, sizeof (ACPI_TABLE_HEADER));
 
     AtBuildLocalTables(UserTable, NullBldTask);
@@ -926,8 +934,7 @@ AtTableTest0016(void)
         return (Status);
     }
 
-    Status = AtSubsystemInit(
-        (AAPITS_INI_PRELOAD & ~AAPITS_INITABLES) | AAPITS_LOADTABLES,
+    Status = AtSubsystemInit(AAPITS_LOADTABLES,
         0, 0, NULL);
     if (ACPI_FAILURE(Status))
     {
