@@ -1429,22 +1429,12 @@ AtLoadTablesErrTest(UINT32 *ErrFlags, int NumCases, ACPI_STATUS *ErrBenchmarks)
             }
 
             Status = AcpiLoadTables();
-            if (ACPI_FAILURE(Status))
-            {
-                AapiErrors++;
-                printf ("API Error: AcpiLoadTables() returned %s\n",
-                    AcpiFormatException(Status));
-                return (Status);
-            }
-
-            Status = AcpiEnableSubsystem(AAPITS_EN_FLAGS);
             if (Status != ErrBenchmarks[i])
             {
                 AapiErrors++;
-                printf ("API Error: AcpiEnableSubsystem() returned %s,"
-                    " expected %s\n",
-                    AcpiFormatException(Status),
-                    AcpiFormatException(ErrBenchmarks[i]));
+                printf("API Error: AcpiLoadTables() returned %s,"
+                        " expected %s\n", AcpiFormatException(Status),
+                        AcpiFormatException(ErrBenchmarks[i]));
                 return (AE_ERROR);
             }
         }
@@ -1522,7 +1512,7 @@ AtTableTest0029(void)
         BAD_LENGTH_HDR_DSDT};
     ACPI_STATUS             ErrBenchmarks[] = {
         AE_BAD_HEADER,
-        AE_BAD_HEADER,
+        AE_OK,
         AE_BAD_HEADER};
 
     if (AT_SKIP_FADT_BAD_HEADER_CHECK)
@@ -1545,9 +1535,9 @@ AtTableTest0030(void)
         BAD_LENGTH_DSC_FADT,
         BAD_LENGTH_DSC_FACS};
     ACPI_STATUS             ErrBenchmarks[] = {
-        AE_NOT_FOUND,
-        AE_INVALID_TABLE_LENGTH,
-        AE_INVALID_TABLE_LENGTH};
+        AE_OK,
+        AE_OK,
+        AE_OK};
 
     return (AtLoadTablesErrTest(ErrFlags,
         (sizeof (ErrFlags) / sizeof (UINT32)),
