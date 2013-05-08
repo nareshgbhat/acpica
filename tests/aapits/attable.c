@@ -1259,6 +1259,11 @@ AtTableTest0024(void)
     /* Skip a part of checks due to ignoring NS load errors for SSDT */
     UINT32                  TSkip[] = {7, 28};
 
+    TestSkipped++;
+    printf("Skip: AcpiTbLoadNamespace() allow for errors while loading tables,"
+            " it tries to get as many tables as possible\n");
+    return (AE_OK );
+
     /*
      * AcpiOsAllocate returns NULL permanently since the specified call
      */
