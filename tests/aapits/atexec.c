@@ -888,7 +888,11 @@ AtGetTableHeader (
     } else if (ACPI_COMPARE_NAME(Type, ACPI_SIG_FADT))
     {
         BldTask.NoTableScale &= ~(BLD_NO_FACS | BLD_NO_DSDT);
+#if ACPI_MACHINE_WIDTH == 64
+        AtBuildLocalFADT2(&LocalFADT, &LocalFACS, &Actual_DSDT, NULL, BldTask);
+#else
         AtBuildLocalFADT1(&LocalFADT, &LocalFACS, &Actual_DSDT, NULL, BldTask);
+#endif
         *Table = (ACPI_TABLE_HEADER *)&LocalFADT;
     } else if (ACPI_COMPARE_NAME(Type, ACPI_SIG_PSDT))
     {
