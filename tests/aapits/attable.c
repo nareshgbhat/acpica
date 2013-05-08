@@ -1362,10 +1362,10 @@ AtTableTest0026(void)
         NULL_ADDRESS_FACS,
         NULL_ADDRESS_DSDT};
     ACPI_STATUS             ErrBenchmarks[] = {
-        AE_NO_ACPI_TABLES,
+            AE_OK,
 //        AE_NO_ACPI_TABLES,
-        AE_NO_ACPI_TABLES,
-        AE_NO_ACPI_TABLES};
+            AE_OK,
+            AE_OK};
 
     return (AtInitializeTablesErrTest(ErrFlags,
         (sizeof (ErrFlags) / sizeof (UINT32)),
@@ -1502,8 +1502,8 @@ AtTableTest0028(void)
     ACPI_STATUS             ErrBenchmarks[] = {
         AE_OK,
         AE_OK,
-        AE_BAD_SIGNATURE,
-        AE_BAD_SIGNATURE};
+        AE_OK,
+        AE_OK};
 
     return (AtInitializeTablesErrTest(ErrFlags,
         (sizeof (ErrFlags) / sizeof (UINT32)),
