@@ -1008,6 +1008,15 @@ AtEvaluateObjectMethodArgCommon(UINT32 MoreArgs)
     UINT8                   OutBuffer[OUT_BUF_LEN];
     UINT32                  Length = sizeof (ACPI_OBJECT) + OUT_BUF_LEN;
 
+    if (MoreArgs)
+    {
+        TestSkipped++;
+        printf("Skip: AtEvaluateObjectMethodArgCommon() ACPICA not allow to"
+                " pass more than the maximum number of 7 arguments to a method,"
+                " it returns AE_LIMIT\n");
+        return (AE_OK);
+    }
+
     if (ACPI_FAILURE(Status = AtAMLcodeFileNameSet("nmsp0000.aml")))
     {
         return (Status);
