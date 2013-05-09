@@ -3163,23 +3163,15 @@ AtTableTest0060(void)
         return (Status);
     }
 
-    free(UserTable);
+    AcpiTbInstallTable(UserTable, NULL, AcpiGbl_RootTableList.CurrentTableCount++);
 
     /* Caller should unmap the header with AcpiOsUnmapMemory */
-    Status = AcpiGetTableHeader(ACPI_SIG_DSDT, 1,
+    Status = AcpiGetTableHeader(ACPI_SIG_DSDT, 2,
         &OutTableHeader2);
     if (ACPI_FAILURE(Status))
     {
         AapiErrors++;
         printf ("API Error: AcpiGetTableHeader(DSDT, 1) returned %s\n",
-            AcpiFormatException(Status));
-        return (Status);
-    }
-    Status = AtReadTableFromFile (AtAMLcodeFileName, &UserTable);
-    if (ACPI_FAILURE(Status))
-    {
-        TestErrors++;
-        printf ("Test error: AtReadTableFromFile(DSDT) failure, %s\n",
             AcpiFormatException(Status));
         return (Status);
     }
