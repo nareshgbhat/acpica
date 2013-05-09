@@ -1314,7 +1314,7 @@ AeRegionHandler (
      * ByteWidth (see above)
      */
     if (((ACPI_INTEGER) Address + ByteWidth) >
-        ((ACPI_INTEGER)(BufferAddress) + Length))
+        ((ACPI_INTEGER)(BaseAddress) + Length))
     {
         ACPI_WARNING ((AE_INFO,
             "Request on [%4.4s] is beyond region limit Req-%X+%X, Base=%X, Len-%X\n",
