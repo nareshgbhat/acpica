@@ -1327,7 +1327,7 @@ AtNSpaceTest0005(void)
 
     if (AcpiGbl_EnableInterpreterSlack)
     {
-        ExpectedLength = 16;
+        ExpectedLength = sizeof (ACPI_OBJECT);
     }
 
     if (ReturnObject.Length != ExpectedLength)
