@@ -1538,6 +1538,11 @@ AtNSpaceTest0010(void)
 {
     ACPI_STATUS             Status;
 
+    TestSkipped++;
+    printf("Skip: AtNSpaceTest0010() iASL can not generate bad opcode"
+            " even with -f option\n");
+    return (AE_OK);
+
     if (ACPI_FAILURE(Status = AtAMLcodeFileNameSet("nmsp0010.aml")))
     {
         return (Status);
