@@ -706,7 +706,8 @@ AtEvaluateObjectCommon(
         Name = NULL;
         break;
     case 4:
-        ReturnObjectPointer->Length = 1;
+        ReturnObjectPointer->Length =
+            ACPI_ROUND_UP_TO_NATIVE_WORD (sizeof (ACPI_OBJECT));
         ReturnObjectPointer->Pointer = NULL;
         break;
     case 5:
@@ -1958,7 +1959,7 @@ AtNSpaceTest0031(void)
 ACPI_STATUS
 AtNSpaceTest0032(void)
 {
-    return (AtEvaluateObjectExceptionCommon(4, AE_BAD_PARAMETER));
+    return (AtEvaluateObjectExceptionCommon(4, AE_NO_MEMORY));
 }
 
 /*
