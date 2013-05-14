@@ -219,7 +219,7 @@ ExecuteTest (
 
     printf ("%s:\n", TestName);
 
-    AcpiGbl_EnableInterpreterSlack = TRUE;
+    AcpiGbl_EnableInterpreterSlack = FALSE;
     printf ("AML Interpreter slack mode enabled\n");
 
     AtTestCase[test_case].Tests[test_num]();
