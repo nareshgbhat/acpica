@@ -972,6 +972,13 @@ AcpiPsGetNextArg (
             {
                 Status = AcpiPsGetNextNamepath (WalkState, ParserState, Arg, 0);
             }
+
+            /* Clean possibly allocated argument */
+            if (ACPI_FAILURE (Status) && (Arg != NULL))
+            {
+                AcpiPsFreeOp (Arg);
+                Arg = NULL;
+            }
         }
         else
         {
