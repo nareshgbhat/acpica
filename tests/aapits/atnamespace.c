@@ -693,12 +693,12 @@ AtEvaluateObjectCommon(
     case 2:
         Name = PathName;
         strcpy(Name, ObjName);
-        Name[strlen(Name) - 1] = '\0';
+        Name[strlen(Name) - 5] = '!';
         break;
     case 8:
         Name = PathName;
         strcpy(Name, ScopePath);
-        Name[strlen(Name) - 1] = '\0';
+        Name[strlen(Name) - 5] = '!';
         strcat(Name, ".");
         strcat(Name, ObjName);
         break;
@@ -1471,6 +1471,13 @@ AtEvaluateObjectExceptionCommon(
     {
         Status = AtEvaluateObjectCommon(
             "\\AUX2", "SS00",
+            ParameterObjects, &ReturnBuffer,
+            ExpectedStatus, 0, CheckAction);
+    }
+    else if (CheckAction == 2)
+    {
+        Status = AtEvaluateObjectCommon(
+            NULL, "\\D1L1.D2L0.D3L0.D4L_.D5L0.L4__",
             ParameterObjects, &ReturnBuffer,
             ExpectedStatus, 0, CheckAction);
     }
