@@ -406,23 +406,23 @@ typedef struct at_device_info
 } AT_DEVICE_INFO;
 
 static AT_DEVICE_INFO   DeviceInfo0000[] = {
-    {0x3f, 0xffffffff, ULL_CONST(0xf00000001),
+    {0x6f, 0x0000001f, ULL_CONST(0xf00000001),
         "PNP0A01", "0", 0xffffff01, 1},
-    {0x3f, 0xffffffff, ULL_CONST(0xf00000002),
+    {0x6e, 0xffffffff, ULL_CONST(0xf00000002),
         "PNP0A02", "1", 0xffff02ff, 1},
-    {0x3f, 0xffffffef, ULL_CONST(0xf00000003),
+    {0x6f, 0xffffffef, ULL_CONST(0xf00000003),
         "ACPI0A03", "d3l0_UID", 0xff03ffff, 2},
-    {0x3d, 0x0ffffff7, ULL_CONST(0xf00000004),
+    {0x6d, 0x0ffffff7, ULL_CONST(0xf00000004),
         "PNP0A04", "999999999", 0x04ffffff, 1},
-    {0x3f, 0x00fffffb, ULL_CONST(0xf00000005),
-        "PNP0A05", "100000000", 0xffffffff, 1},
-    {0x2f, 0x000ffffd, ULL_CONST(0xf00000006),
+    {0x2f, 0x00fffffb, ULL_CONST(0xf00000005),
+        "PNP0A05", "1000000000", 0xffffffff, 1},
+    {0x4f, 0x000ffffd, ULL_CONST(0xf00000006),
         "PNP0A06", "d6l0_UID", 0x01020304, 1},
-    {0x37, 0x0000ffff, ULL_CONST(0xf00000007),
+    {0x67, 0x0000ffff, ULL_CONST(0xf00000007),
         "ACPI0A07", "", 0xff02ff01, 3},
-    {0x3b, 0x0000fffe, ULL_CONST(0xf00000008),
+    {0x6b, 0x0000fffe, ULL_CONST(0xf00000008),
         "PNP0A08", "d8l0_UID", 0xd1e2f3ff, 1},
-    {0x3f, 0x00000000, ULL_CONST(0xf00000009),
+    {0x2f, 0x00000000, ULL_CONST(0xf00000009),
         "PNP0A09", "d9l0_UID", 0xffffffff, 7},
 };
 
@@ -2521,7 +2521,7 @@ AtGetObjectInfoTypeCommon(
             }
         }
 
-        AcpiOsFree(Info);
+        ACPI_FREE (Info);
 //        ReturnObjBuffer = ReturnBuffer;
     }
 
