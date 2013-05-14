@@ -1609,7 +1609,7 @@ AtNSpaceTest0011(void)
 
     Status = AtEvaluateObjectCommon(
         NULL, "\\M000", NULL, NULL,
-        AE_AML_NO_OPERAND, 0, 0);
+        AE_AML_NO_RETURN_VALUE, 0, 0);
     if (ACPI_FAILURE(Status))
     {
         return (Status);
@@ -1862,7 +1862,7 @@ AtNSpaceTest0022(void)
 
     return (AtEvaluateObjectMethodException1(
         "nmsp0022.aml",
-        "\\M000", AE_AML_BAD_NAME,
+        "\\M000", AE_NOT_FOUND,
         "\\I000", 0x0));
 }
 
@@ -1877,7 +1877,7 @@ AtNSpaceTest0023(void)
 
     return (AtEvaluateObjectMethodException1(
         "nmsp0023.aml",
-        "\\M000", AE_AML_NAME_NOT_FOUND,
+        "\\M000", AE_NOT_FOUND,
         "\\I000", 0x0));
 }
 
@@ -1890,7 +1890,7 @@ AtNSpaceTest0025(void)
 {
     return (AtEvaluateObjectMethodException1(
         "nmsp0025.aml",
-        "\\M000", AE_AML_INTERNAL,
+        "\\M000", AE_AML_OPERAND_TYPE,
         "\\I000", 0x0));
 }
 
@@ -1901,7 +1901,7 @@ AtNSpaceTest0025(void)
 ACPI_STATUS
 AtNSpaceTest0026(void)
 {
-    return (AtEvaluateObjectExceptionCommon(1, AE_BAD_CHARACTER));
+    return (AtEvaluateObjectExceptionCommon(1, AE_NOT_FOUND));
 }
 
 /*
@@ -2273,7 +2273,7 @@ AtNSpaceTest0037(void)
 {
     return (AtEvaluateObjectMethodException1(
         "nmsp0037.aml",
-        "\\M000", AE_NULL_OBJECT,
+        "\\M000", AE_NOT_FOUND,
         "\\I000", 0x0));
 }
 
