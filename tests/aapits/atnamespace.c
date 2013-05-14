@@ -2079,6 +2079,12 @@ AtNSpaceTest0035(void)
 {
     ACPI_STATUS             Status;
 
+    TestSkipped++;
+    printf("Skip: AtNSpaceTest0035() AcpiEvaluateObject allow for some"
+            "allocation failure during object evaluation as long as job can be"
+            "completed\n");
+    return (AE_OK);
+
     if (ACPI_FAILURE(Status = AtAMLcodeFileNameSet("nmsp0000.aml")))
     {
         return (Status);
