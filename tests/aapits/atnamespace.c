@@ -12,19 +12,19 @@
         ACPI_MODULE_NAME    ("atnamespace")
 
 static ACPI_STRING      Level0TypeNames0000[] = {
+    "\\_GPE",
     "\\_REV",
-    "\\_REV",
-    "\\STR0",
+    "\\_OS_",
     "\\BUF0",
     "\\PAC0",
     "\\FLU0",
-    "\\DEV0",
+    "\\_SB_",
     "\\EVE0",
-    "\\MMM0",
-    "\\MTX0",
+    "\\_OSI",
+    "\\_GL_",
     "\\OPR0",
     "\\PWR0",
-    "\\CPU0",
+    "\\AUX0",
     "\\TZN0",
     "\\BFL0",
 };
