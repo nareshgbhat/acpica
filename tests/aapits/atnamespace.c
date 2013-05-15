@@ -2286,7 +2286,6 @@ AtGetObjectInfoCommon(
 {
     ACPI_STATUS             Status;
     ACPI_HANDLE             ObjHandle;
-    ACPI_DEVICE_INFO        *LocalInfo;
 
 
     if (CheckAction == 3 && ACPI_FAILURE(Status = AtAuxiliarySsdt(AT_LOAD)))
@@ -2326,13 +2325,9 @@ AtGetObjectInfoCommon(
             return (Status);
         }
         break;
-    case 4:
-        *Info = NULL;
-        break;
     }
 
-    Status = AcpiGetObjectInfo (ObjHandle, &LocalInfo);
-    *Info = LocalInfo;
+    Status = AcpiGetObjectInfo (ObjHandle, CheckAction != 4 ? Info : NULL);
 
     if (Status != ExpectedStatus)
     {
