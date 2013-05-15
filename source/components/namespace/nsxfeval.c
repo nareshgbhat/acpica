@@ -624,9 +624,17 @@ AcpiWalkNamespace (
         goto UnlockAndExit;
     }
 
-    Status = AcpiNsWalkNamespace (Type, StartObject, MaxDepth,
-                ACPI_NS_WALK_UNLOCK, PreOrderVisit,
-                PostOrderVisit, Context, ReturnValue);
+    /* Check if StartObject is NS valid object, it can be unloaded meantime */
+    if (!AcpiNsValidateHandle (StartObject))
+    {
+        Status = AE_BAD_PARAMETER;
+    }
+    else
+    {
+        Status = AcpiNsWalkNamespace(Type, StartObject, MaxDepth,
+            ACPI_NS_WALK_UNLOCK, PreOrderVisit, PostOrderVisit, Context,
+            ReturnValue);
+    }
 
     (void) AcpiUtReleaseMutex (ACPI_MTX_NAMESPACE);
 
