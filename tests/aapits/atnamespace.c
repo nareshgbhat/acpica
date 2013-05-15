@@ -5266,8 +5266,6 @@ AtGetDevicesHandler (
     ACPI_BUFFER             OutName = {AT_PATHNAME_MAX, PathName};
     UINT32                  i;
 
-    ++GetDevicesHandlerCounter;
-
     Status = AcpiGetName (ObjHandle, ACPI_FULL_PATHNAME, &OutName);
 
     if (ACPI_FAILURE(Status))
@@ -5299,6 +5297,8 @@ AtGetDevicesHandler (
     {
         if (strcmp(GetDevicesHandlerContext.WalkInfo[i].PathName, PathName) == 0)
         {
+            ++GetDevicesHandlerCounter;
+
             GetDevicesHandlerContext.WalkInfo[i].WalkCount++;
             GetDevicesHandlerContext.WalkInfo[i].XfNestingLevel = NestingLevel;
             GetDevicesHandlerContext.WalkInfo[i].HandlerCount = GetDevicesHandlerCounter;
@@ -7204,8 +7204,6 @@ AtWalkNamespaceHandler (
     ACPI_BUFFER             OutName = {AT_PATHNAME_MAX, PathName};
     UINT32                  i;
 
-    ++WalkNamespaceHandlerCounter;
-
     Status = AcpiGetName (ObjHandle, ACPI_FULL_PATHNAME, &OutName);
 
     if (ACPI_FAILURE(Status))
@@ -7240,6 +7238,8 @@ AtWalkNamespaceHandler (
     {
         if (strcmp(WalkNamespaceHandlerContext.WalkInfo[i].PathName, PathName) == 0)
         {
+            ++WalkNamespaceHandlerCounter;
+
             WalkNamespaceHandlerContext.WalkInfo[i].WalkCount++;
             WalkNamespaceHandlerContext.WalkInfo[i].XfNestingLevel = NestingLevel;
             WalkNamespaceHandlerContext.WalkInfo[i].HandlerCount =
