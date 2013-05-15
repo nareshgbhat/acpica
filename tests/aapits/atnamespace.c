@@ -7174,7 +7174,8 @@ AtNSpaceTest0108(void)
 ACPI_STATUS
 AtNSpaceTest0110(void)
 {
-    void                    *Data[] = {DataBuffer + 1};
+    void                    *Data[] = {DataBuffer + 1, DataBuffer + 1,
+        DataBuffer + 1};
     UINT32                  HandlerId[] = {1};
     ACPI_OBJECT_HANDLER     Handlers[] = {AttachDataHandler1};
     UINT32                  DetachHandlerId[] = {0, 1, 2};
