@@ -4387,7 +4387,7 @@ AtGetHandleExceptionCommon(
 ACPI_STATUS
 AtNSpaceTest0065(void)
 {
-    return (AtGetHandleExceptionCommon(1, AE_BAD_CHARACTER));
+    return (AtGetHandleExceptionCommon(1, AE_NOT_FOUND));
 }
 
 /*
@@ -4448,7 +4448,7 @@ AtNSpaceTest0070(void)
 
     Status = AcpiGetHandle (NULL, "\\D1L1.D2L0.D3L0.D4L_.D5L0.L4__", &OutHandle);
 
-    if (Status != AE_NO_NAMESPACE)
+    if (Status != AE_NOT_FOUND)
     {
         AapiErrors++;
         printf ("AtGetHandleCommon: AcpiGetHandle() returned %s,"
@@ -5007,7 +5007,7 @@ AtGetNameExceptionCommon(
         return (Status);
     }
 
-    return (AtTerminateCtrlCheck(AE_OK, ALL_STAT));
+    return (AtTerminateCtrlCheck(AE_OK, ALL_STAT & ~FREE_STAT));
 }
 
 /*
@@ -5057,7 +5057,7 @@ AtNSpaceTest0079(void)
 ACPI_STATUS
 AtNSpaceTest0080(void)
 {
-    return (AtGetNameExceptionCommon(5, AE_NO_NAMESPACE));
+    return (AtGetNameExceptionCommon(5, AE_BAD_PARAMETER));
 }
 
 ACPI_STATUS
