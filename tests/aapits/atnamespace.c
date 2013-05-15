@@ -2735,6 +2735,11 @@ AtNSpaceTest0044(void)
     ACPI_STATUS             Status;
     ACPI_STRING             Node = "\\D1L1.D2L0.D3L0.D4L_.D5L0";
 
+    TestSkipped++;
+    printf("Skip: AtNSpaceTest0044() AcpiGetObjectInfo allow for some"
+            "allocation failure, it tries to get as many info as possible\n");
+    return (AE_OK);
+
     if (ACPI_FAILURE(Status = AtAMLcodeFileNameSet("nmsp0000.aml")))
     {
         return (Status);
