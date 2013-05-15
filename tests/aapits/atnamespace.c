@@ -5419,7 +5419,7 @@ AtNSpaceTest0082(void)
         return (Status);
     }
 
-    Status = AtGetDevicesCommon("PCI\\VEN_ffff&DEV_dddd&SUBSYS_cccccccc&REV_01", AE_OK, AE_OK,
+    Status = AtGetDevicesCommon("PCI\\VEN_FFFF&DEV_DDDD&SUBSYS_CCCCCCCC&REV_01", AE_OK, AE_OK,
         sizeof (DeviceWalkInfoDev7) / sizeof (AT_WALK_INFO) + 1,
         sizeof (DeviceWalkInfoDev7) / sizeof (AT_WALK_INFO),
         DeviceWalkInfoDev7);
