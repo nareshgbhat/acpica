@@ -5682,6 +5682,12 @@ AtNSpaceTest0088(void)
 {
     ACPI_STATUS             Status;
 
+    TestSkipped++;
+    printf("Skip: AtNSpaceTest0088() AcpiGetDevices allow for some allocation"
+            " failure, it tries to walk through namespace as long as"
+            " possible\n");
+    return (AE_OK);
+
     if (ACPI_FAILURE(Status = AtAMLcodeFileNameSet("nmsp0000.aml")))
     {
         return (Status);
