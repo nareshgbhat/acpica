@@ -6422,7 +6422,8 @@ AtDetachDataCommon(
 
     for (i = 0; i < DetachNumId; i++)
     {
-        Status = AcpiDetachData(Object, DetachHandlers[i]);
+        Status = AcpiDetachData(ExpectedStatus[i] != AE_BAD_PARAMETER?
+            Object : NULL, DetachHandlers[i]);
 
         if (Status != ExpectedStatus[i])
         {
@@ -6844,7 +6845,8 @@ AtGetDataCommon(
 
     for (i = 0; i < GetNumId; i++)
     {
-        Status = AcpiGetData(Object, GetHandlers[i], RetDataPointer);
+        Status = AcpiGetData(ExpectedStatus[i] != AE_BAD_PARAMETER ?
+            Object : NULL, GetHandlers[i], RetDataPointer);
 
         if (Status != ExpectedStatus[i])
         {
