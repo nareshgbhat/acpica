@@ -7620,7 +7620,7 @@ AtNSpaceTest0118(void)
     ACPI_STATUS             Status;
     UINT32                  i;
 
-    for (i = ACPI_TYPE_EXTERNAL_MAX + 1; i < 20; i++)
+    for (i = ACPI_TYPE_LOCAL_MAX + 1; i < ACPI_TYPE_LOCAL_MAX + 4; i++)
     {
         Status = AtWalkNamespaceCommon(i,
             "\\D1L3", 1, 1,
