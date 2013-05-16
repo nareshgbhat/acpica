@@ -763,6 +763,8 @@ AcpiNsTerminate (
     void)
 {
     ACPI_OPERAND_OBJECT     *ObjDesc;
+    ACPI_OPERAND_OBJECT     *NextDesc;
+    ACPI_STATUS             Status;
 
 
     ACPI_FUNCTION_TRACE (NsTerminate);
@@ -777,11 +779,44 @@ AcpiNsTerminate (
 
     /* Detach any objects attached to the root */
 
+    /* Lock namespace for possible update */
+
+    Status = AcpiUtAcquireMutex (ACPI_MTX_NAMESPACE);
+    if (ACPI_FAILURE (Status))
+    {
+        return_VOID;
+    }
+
     ObjDesc = AcpiNsGetAttachedObject (AcpiGbl_RootNode);
     if (ObjDesc)
     {
         AcpiNsDetachObject (AcpiGbl_RootNode);
+
+        /*
+         * Special case for root node and possibly attached data object list.
+         * Note that AcpiGbl_RootNode is statically allocated object and
+         * AcpiNsDeleteNode function assume to delete node, thus it can not be
+         * called for root node here.
+         */
+
+        ObjDesc = AcpiGbl_RootNode->Object;
+        while (ObjDesc &&
+            (ObjDesc->Common.Type == ACPI_TYPE_LOCAL_DATA))
+        {
+            /* Invoke the attached data deletion handler if present */
+
+            if (ObjDesc->Data.Handler)
+            {
+                ObjDesc->Data.Handler (AcpiGbl_RootNode, ObjDesc->Data.Pointer);
+            }
+
+            NextDesc = ObjDesc->Common.NextObject;
+            AcpiUtRemoveReference (ObjDesc);
+            ObjDesc = NextDesc;
+        }
     }
+
+    (void) AcpiUtReleaseMutex (ACPI_MTX_NAMESPACE);
 
     ACPI_DEBUG_PRINT ((ACPI_DB_INFO, "Namespace freed\n"));
     return_VOID;
