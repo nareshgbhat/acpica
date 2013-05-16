@@ -5771,10 +5771,6 @@ AttachDataHandler##Hid( \
     } \
     printf ("AttachDataHandler%d %d: Object 0x%p, Data  0x%p\n", \
             Hid, i, Object, Data); \
-    if (Hid == 1) \
-    { \
-        AcpiDetachData(Object, AttachDataHandler##Hid); \
-    } \
 }
 
 DEF_ATTACH_DATA_HANDLER(0)
