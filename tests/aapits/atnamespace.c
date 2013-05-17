@@ -5943,6 +5943,12 @@ AtAttachDataCommon(
                 AcpiFormatException(Status));
             return (Status);
         }
+        /*
+         * Wait till the other thread finish its job.
+         * XXX: pthread_join() should be called here instead. However, it
+         * require thread ID obtaining.
+         */
+        AcpiOsSleep(1000);
     }
 
     if ((UnloadFlag == 1) || (UnloadFlag == 3) || (UnloadFlag == 4))
