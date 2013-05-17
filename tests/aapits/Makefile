@@ -193,6 +193,8 @@ SRCS=	atexec.c atmain.c \
 
 CFLAGS+= -Wall -g -D_LINUX -DNDEBUG -D_CONSOLE -DACPI_EXEC_APP -D_MULTI_THREADED -Wstrict-prototypes -I../../source/include 
 
+LDFLAGS+= -pthread
+
 
 acpiexec : $(patsubst %.c,%.o, $(SRCS))
 	$(CC) $(LDFLAGS) $(patsubst %.c,%.o, $(SRCS)) -o $(PROG)

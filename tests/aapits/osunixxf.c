@@ -786,9 +786,8 @@ AcpiOsActualExecute (
     ACPI_OSD_EXEC_CALLBACK  Function,
     void                    *Context)
 {
-
-//    _beginthread (Function, (unsigned) 0, Context);
-    return (0);
+    pthread_t thread;
+    return (pthread_create(&thread, NULL, Function, Context));
 }
 
 
@@ -1143,7 +1142,7 @@ AcpiOsActualWriteMemory (
 ACPI_THREAD_ID
 AcpiOsActualGetThreadId(void)
 {
-    return ((ACPI_THREAD_ID) getpid());
+    return ((ACPI_THREAD_ID) pthread_self());
 }
 
 
