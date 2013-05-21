@@ -421,7 +421,8 @@ void
 AcpiDsDeleteResultIfNotUsed (
     ACPI_PARSE_OBJECT       *Op,
     ACPI_OPERAND_OBJECT     *ResultObj,
-    ACPI_WALK_STATE         *WalkState);
+    ACPI_WALK_STATE         *WalkState,
+    ACPI_STATUS             PrevStatus);
 
 ACPI_STATUS
 AcpiDsCreateOperand (
