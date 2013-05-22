@@ -408,7 +408,7 @@ typedef struct at_device_info
 static AT_DEVICE_INFO   DeviceInfo0000[] = {
     {0x6f, 0x0000001f, ULL_CONST(0xf00000001),
         "PNP0A01", "0", 0xffffff01, 1},
-    {0x6e, 0xffffffff, ULL_CONST(0xf00000002),
+    {0x6f, 0xffffffff, ULL_CONST(0xf00000002),
         "PNP0A02", "1", 0xffff02ff, 1},
     {0x6f, 0xffffffef, ULL_CONST(0xf00000003),
         "ACPI0A03", "d3l0_UID", 0xff03ffff, 2},
@@ -2429,7 +2429,8 @@ AtGetObjectInfoTypeCommon(
             return (AE_ERROR);
         }
 
-        if (Info->Type != ACPI_TYPE_DEVICE && Info->Valid != 0)
+        if (Info->Type != ACPI_TYPE_DEVICE &&
+            (Info->Valid & ~ACPI_VALID_STA) != 0)
         {
             AapiErrors++;
             printf ("API Error: Valid of %s (%d) != (%d)\n",
