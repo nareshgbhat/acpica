@@ -793,6 +793,12 @@ AcpiWalkResources (
         return_ACPI_STATUS (AE_BAD_PARAMETER);
     }
 
+    /* Validate the device handle, it can be unloaded meantime */
+    if (!AcpiNsValidateHandle (DeviceHandle))
+    {
+        return_ACPI_STATUS (AE_BAD_PARAMETER);
+    }
+
     /* Get the _CRS/_PRS/_AEI resource list */
 
     Buffer.Length = ACPI_ALLOCATE_LOCAL_BUFFER;
