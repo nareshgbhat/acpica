@@ -2132,15 +2132,15 @@ AtRsrcTest0029(void)
 {
     ACPI_STATUS             Status;
 
-    Status = AtWalkResourcesTestCommon("_CRS", AE_CTRL_DEPTH, AE_OK,
-        25, RT0000_DEV0_CRS_LEN);
+    Status = AtWalkResourcesTestCommon("_CRS", AE_CTRL_DEPTH, AE_CTRL_DEPTH,
+        1, 16);
     if (ACPI_FAILURE(Status))
     {
         return (Status);
     }
 
-    Status = AtWalkResourcesTestCommon("_PRS", AE_CTRL_DEPTH, AE_OK,
-        25, RT0000_DEV0_CRS_LEN);
+    Status = AtWalkResourcesTestCommon("_PRS", AE_CTRL_DEPTH, AE_CTRL_DEPTH,
+        1, 16);
     if (ACPI_FAILURE(Status))
     {
         return (Status);
