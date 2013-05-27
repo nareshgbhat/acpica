@@ -181,6 +181,14 @@ AcpiInstallNotifyHandler (
         return_ACPI_STATUS (Status);
     }
 
+    /* Validate the device handle, it can be unloaded meantime */
+
+    if (!AcpiNsValidateHandle (Device))
+    {
+        Status = AE_BAD_PARAMETER;
+        goto UnlockAndExit;
+    }
+
     /*
      * Root Object:
      * Registering a notify handler on the root object indicates that the
@@ -360,6 +368,14 @@ AcpiRemoveNotifyHandler (
     if (ACPI_FAILURE (Status))
     {
         return_ACPI_STATUS (Status);
+    }
+
+    /* Validate the device handle, it can be unloaded meantime */
+
+    if (!AcpiNsValidateHandle (Device))
+    {
+        Status = AE_BAD_PARAMETER;
+        goto UnlockAndExit;
     }
 
     /* Root Object. Global handlers are removed here */
