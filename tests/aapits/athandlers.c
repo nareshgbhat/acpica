@@ -435,7 +435,7 @@ AtInstallNotifyHandlerCommon(
 
             for (j = 0; j < TestData[i].NotifyHandlerNum; j++)
             {
-                Type = (j)? ACPI_DEVICE_NOTIFY: ACPI_SYSTEM_NOTIFY;
+                Type = (j)? ACPI_SYSTEM_NOTIFY : ACPI_DEVICE_NOTIFY;
                 Handler = TestData[i].Handler[
                     (j + 1) % TestData[i].NotifyHandlerNum];
                 Context = NULL;
