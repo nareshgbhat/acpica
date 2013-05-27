@@ -1096,7 +1096,7 @@ AtHndlrTest0015(void)
 {
     return (AtRemoveNotifyHandlerCommon("\\TST0", NotifyTestData0001,
         sizeof (NotifyTestData0001) / sizeof (AT_NOTIFY_TEST_DATA),
-        5, AE_BAD_PARAMETER));
+        5, AE_NOT_EXIST));
 }
 
 #define AT_NUM_ADR_SPACE_ID   7
