@@ -153,6 +153,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <unistd.h>
+#include <pthread.h>
 
 /* Host-dependent types and defines for user-space ACPICA */
 

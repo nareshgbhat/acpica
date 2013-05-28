@@ -27,7 +27,5 @@ AtMemoryTest0000(void)
         return (Status);
     }
 
-    TestSkipped++;
-
     return (AtTerminateCtrlCheck(AE_OK, ALL_STAT));
 }

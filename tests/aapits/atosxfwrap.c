@@ -65,7 +65,7 @@ AcpiOsTerminate (void)
     if (!OsInitialized)
     {
         printf("AcpiOsTerminate: OSL has not been initialized\n");
-//        return (AE_ERROR);
+        return (AE_ERROR);
     }
 
 #ifdef ACPI_DBG_TRACK_ALLOCATIONS
@@ -737,11 +737,11 @@ void
 AcpiOsDeleteLock (
     ACPI_HANDLE             Handle)
 {
-    AT_CTRL_DECL0(AcpiOsDeleteLock);
+    AT_CTRL_DECL(AcpiOsDeleteLock);
 
-    AcpiOsActualDeleteLock(Handle);
+    Status = AcpiOsActualDeleteLock(Handle);
 
-    AT_CTRL_SUCCESS0(AcpiOsDeleteLock);
+    AT_CTRL_SUCCESS(AcpiOsDeleteLock);
 
     return;
 }

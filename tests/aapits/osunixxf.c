@@ -580,8 +580,10 @@ AcpiOsActualCreateSemaphore (
     ACPI_HANDLE         *OutHandle)
 {
 
+    *OutHandle = (ACPI_HANDLE) malloc ((size_t) sizeof(UINT32));
+    memset(*OutHandle, InitialUnits == 0 ? 0 : 1, sizeof(UINT32));
+    OsxfCtrlAddQueue(*OutHandle);
 
-    *OutHandle = (ACPI_HANDLE) 1;
     return (AE_OK);
 }
 
@@ -602,10 +604,11 @@ AcpiOsActualDeleteSemaphore (
     ACPI_HANDLE         Handle)
 {
 
-    if (!Handle)
+    if (!Handle || !OsxfCtrlDelQueue(Handle))
     {
         return (AE_BAD_PARAMETER);
     }
+    free(Handle);
 
     return (AE_OK);
 }
@@ -632,6 +635,19 @@ AcpiOsActualWaitSemaphore (
     UINT16              Timeout)
 {
 
+    if (!Handle || !OsxfCtrlCheckQueue(Handle))
+    {
+        return (AE_BAD_PARAMETER);
+    }
+
+    while ((*(UINT32 *)Handle == 0))
+    {
+        if ((Timeout != ACPI_WAIT_FOREVER))
+        {
+            return (AE_TIME);
+        }
+    }
+    *(UINT32 *)Handle = 0;
 
     return (AE_OK);
 }
@@ -656,6 +672,12 @@ AcpiOsActualSignalSemaphore (
     UINT32              Units)
 {
 
+    if (!Handle || !OsxfCtrlCheckQueue(Handle))
+    {
+        return (AE_BAD_PARAMETER);
+    }
+
+    *(UINT32 *)Handle = 1;
 
     return (AE_OK);
 }
@@ -669,11 +691,11 @@ AcpiOsActualCreateLock (
     return (AcpiOsCreateSemaphore (1, 1, OutHandle));
 }
 
-void
+ACPI_STATUS
 AcpiOsActualDeleteLock (
     ACPI_HANDLE             Handle)
 {
-    AcpiOsDeleteSemaphore (Handle);
+    return (AcpiOsDeleteSemaphore (Handle));
 }
 
 
@@ -764,9 +786,8 @@ AcpiOsActualExecute (
     ACPI_OSD_EXEC_CALLBACK  Function,
     void                    *Context)
 {
-
-//    _beginthread (Function, (unsigned) 0, Context);
-    return (0);
+    pthread_t thread;
+    return (pthread_create(&thread, NULL, Function, Context));
 }
 
 
@@ -1121,7 +1142,7 @@ AcpiOsActualWriteMemory (
 ACPI_THREAD_ID
 AcpiOsActualGetThreadId(void)
 {
-    return ((ACPI_THREAD_ID) getpid());
+    return ((ACPI_THREAD_ID) pthread_self());
 }
 
 
@@ -1165,4 +1186,24 @@ AcpiOsActualSignal (
 
 
     return (AE_OK);
+}
+
+/******************************************************************************
+ *
+ * FUNCTION:    AcpiOsWaitEventsComplete
+ *
+ * PARAMETERS:  None
+ *
+ * RETURN:      None
+ *
+ * DESCRIPTION: Wait for all asynchronous events to complete. This
+ *              implementation does nothing.
+ *
+ *****************************************************************************/
+
+void
+AcpiOsWaitEventsComplete (
+    void)
+{
+    return;
 }

@@ -830,7 +830,8 @@ Cleanup:
          * Parent will not use the result -- such as any
          * non-nested type2 op in a method (parent will be method)
          */
-        AcpiDsDeleteResultIfNotUsed (Op, WalkState->ResultObj, WalkState);
+        AcpiDsDeleteResultIfNotUsed (Op, WalkState->ResultObj, WalkState,
+            Status);
     }
 
 #ifdef _UNDER_DEVELOPMENT

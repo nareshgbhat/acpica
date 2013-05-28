@@ -1193,7 +1193,7 @@ AtExceptionCommonTest(
             }
         }
 
-        Status = AtTerminateCtrlCheck(AE_OK, ALL_STAT);
+        Status = AtTerminateCtrlCheck(AE_OK, ALL_STAT & ~MALLOC_STAT);
         if (ACPI_FAILURE(Status))
         {
             return (Status);
@@ -1256,25 +1256,12 @@ Init_NO_MEMORY_Test1(
     UINT32              TFst2,
     UINT32              Check)
 {
-    ACPI_STATUS         Status;
-
     /*
      * AcpiOsAllocate returns NULL permanently since the specified call
      */
-    Status = AtInitTermCommonTest(OSXF_NUM(AcpiOsAllocate),
-        AtActD_Permanent, AtActRet_NULL, TFst1, Check,
-        AE_NO_MEMORY);
-    if (ACPI_FAILURE(Status))
-    {
-        return (Status);
-    }
-
-    /*
-     * AcpiOsAllocate returns NULL one time on the specified call
-     */
     return (AtInitTermCommonTest(OSXF_NUM(AcpiOsAllocate),
-        AtActD_OneTime, AtActRet_NULL, TFst2, Check,
-        AE_NO_MEMORY));
+            AtActD_Permanent, AtActRet_NULL, TFst1, Check,
+            AE_NO_MEMORY));
 }
 
 ACPI_STATUS
@@ -1423,9 +1410,9 @@ AtInitTest0006(void)
         }
 
         /*
-         * Check the total number of AcpiOS* invocations
+         * Check if AcpiOS* invocations were succeed
          */
-        Status = OsxfCtrlCheck(TOTAL_STAT, 1);
+        Status = OsxfCtrlCheck(SYS_STAT, 1);
         if (ACPI_FAILURE(Status))
         {
             AapiErrors++;
@@ -1447,6 +1434,14 @@ AtInitTest0007(void)
 
     for (i = 0; i < RMax; i++)
     {
+        /*
+         * Reset controls statistic, this prevents influence statistic from
+         * previous loop round.
+         */
+        OsxfCtrlInit();
+        OsxfUpdateCallsMark();
+        OsxfCtrlGetDiff(TOTAL_STAT);
+
         Status = AcpiInitializeSubsystem();
         if (ACPI_FAILURE(Status))
         {
@@ -1486,7 +1481,7 @@ AtInitTest0007(void)
             /*
              * Check the total number of AcpiOS* invocations
              */
-            Status = AtTerminateCtrlCheck(AE_OK, TOTAL_STAT);
+            Status = AtTerminateCtrlCheck(AE_OK, SYS_STAT & ~OSINIT_STAT);
             if (ACPI_FAILURE(Status))
             {
                 return (Status);
@@ -1518,7 +1513,7 @@ AtInitTest0009(void)
     if (Test_Flags & MALLOC_STAT)
     {
         Status = Init_NO_MEMORY_Test1(1, 1,
-            CHECK_INIT_COND | CHECK_TERM_ACT | CHECK_FREE_COND);
+            CHECK_INIT_COND | CHECK_TERM_ACT);
         if (ACPI_FAILURE(Status))
         {
             return (Status);
@@ -1528,7 +1523,7 @@ AtInitTest0009(void)
     if (Test_Flags & LOCK_STAT)
     {
         Status = Init_NO_MEMORY_Test2(1, 1,
-            CHECK_INIT_COND | CHECK_TERM_ACT | CHECK_FREE_COND);
+            CHECK_INIT_COND | CHECK_TERM_ACT);
         if (ACPI_FAILURE(Status))
         {
             return (Status);
@@ -1538,7 +1533,7 @@ AtInitTest0009(void)
     if (Test_Flags & SEMAPH_STAT)
     {
         Status = Init_NO_MEMORY_Test3(1, 1,
-            CHECK_INIT_COND | CHECK_TERM_ACT | CHECK_FREE_COND);
+            CHECK_INIT_COND | CHECK_TERM_ACT);
         if (ACPI_FAILURE(Status))
         {
             return (Status);
@@ -1561,7 +1556,7 @@ AtInitTest0010(void)
         Check_Flags &= ~CHECK_FREE_COND;
     }
     return (AtInitTermCommonTest(OSXF_NUM(AcpiOsTotal),
-        AtActD_OneTime, AtActRet_ERROR, 1,
+        AtActD_Permanent, AtActRet_ERROR, 1,
         Check_Flags, AE_ERROR));
 }
 
@@ -1696,7 +1691,7 @@ AtInitTest0013(void)
         /*
          * Check the total number of AcpiOS* invocations
          */
-        Status = OsxfCtrlCheck(TOTAL_STAT, 0);
+        Status = OsxfCtrlCheck(TOTAL_STAT, 1);
         if (ACPI_FAILURE(Status))
         {
             AapiErrors++;
@@ -3295,7 +3290,7 @@ AtInitializationHandlerCommon(
     UINT32                  StagesScale = 0;
     UINT32                  i, j;
     UINT32                  Stages[3] = {
-        AAPITS_INITIALIZE_SS, AAPITS_LOADTABLES, AAPITS_ENABLE_SS};
+        AAPITS_INI_PRELOAD, AAPITS_LOADTABLES, AAPITS_ENABLE_SS};
 
     if (ACPI_FAILURE(Status = AtAMLcodeFileNameSet(AmlName)))
     {
@@ -3452,7 +3447,7 @@ AtInitTest0048(void)
     UINT32                  StagesScale = 0;
     UINT32                  i, j;
     UINT32                  Stages[3] = {
-        AAPITS_INITIALIZE_SS, AAPITS_LOADTABLES, AAPITS_ENABLE_SS};
+        AAPITS_INI_PRELOAD, AAPITS_LOADTABLES, AAPITS_ENABLE_SS};
 
     if (ACPI_FAILURE(Status = AtAMLcodeFileNameSet("init0032.aml")))
     {
@@ -3530,7 +3525,7 @@ AtInitTest0048(void)
             return (Status);
         }
 
-        if (ACPI_FAILURE(Status = AtInitializationHandlerCallsCheck(5)))
+        if (ACPI_FAILURE(Status = AtInitializationHandlerCallsCheck(8)))
         {
             return (Status);
         }
@@ -3819,7 +3814,8 @@ ACPI_STATUS  AllExceptionsCodes[] = {
     AE_ABORT_METHOD,
     AE_SAME_HANDLER,
     AE_NO_HANDLER,
-//    AE_OWNER_ID_LIMIT,
+    AE_OWNER_ID_LIMIT,
+    AE_NOT_CONFIGURED,
     AE_BAD_PARAMETER,
     AE_BAD_CHARACTER,
     AE_BAD_PATHNAME,
@@ -3904,8 +3900,9 @@ char  *AllExceptionsStrings[] = {
     TO_STRING(AE_NO_GLOBAL_LOCK),
     TO_STRING(AE_ABORT_METHOD),
     TO_STRING(AE_SAME_HANDLER),
-    TO_STRING(AE_WAKE_ONLY_GPE),
-//    TO_STRING(AE_OWNER_ID_LIMIT),
+    TO_STRING(AE_NO_HANDLER),
+    TO_STRING(AE_OWNER_ID_LIMIT),
+    TO_STRING(AE_NOT_CONFIGURED),
     TO_STRING(AE_BAD_PARAMETER),
     TO_STRING(AE_BAD_CHARACTER),
     TO_STRING(AE_BAD_PATHNAME),
@@ -4251,7 +4248,7 @@ AtInitTest0060(void)
     }
 
     Status = AcpiLoadTables();
-    if (ACPI_FAILURE(Status))
+    if (Status != AE_NO_ACPI_TABLES)
     {
         AapiErrors++;
         printf ("API error: AcpiLoadTables() returned %s\n",
@@ -4260,7 +4257,7 @@ AtInitTest0060(void)
     }
 
     Status = AcpiEnableSubsystem(0);
-    if (Status != AE_NO_ACPI_TABLES)
+    if (Status != AE_ERROR)
     {
         AapiErrors++;
         printf ("API error: AcpiEnableSubsystem () returned %s, expected %s\n",

@@ -160,6 +160,10 @@ AcpiLoadTables (
         ACPI_EXCEPTION ((AE_INFO, Status,
             "While loading namespace from ACPI tables"));
     }
+    else
+    {
+        AcpiGbl_StartupFlags |= ACPI_LOAD_TABLE;
+    }
 
     return_ACPI_STATUS (Status);
 }

@@ -165,7 +165,7 @@ AtTbInitGenericAddress (
 
     NewGasStruct->Address = Address;
     NewGasStruct->SpaceId = ACPI_ADR_SPACE_SYSTEM_IO;
-    NewGasStruct->BitWidth = BitWidth;
+    NewGasStruct->BitWidth = ACPI_MUL_8 (BitWidth);
     NewGasStruct->BitOffset = 0;
     NewGasStruct->AccessWidth = 0;
 }
@@ -484,21 +484,21 @@ AtBuildLocalFADT2 (
     LocalFADT->Gpe1Base = 96;
 
     LocalFADT->Pm1EventLength = 4;
-    LocalFADT->Pm1ControlLength = 4;
+    LocalFADT->Pm1ControlLength = 2;
     LocalFADT->Pm2ControlLength = 1; /* optional */
-    LocalFADT->PmTimerLength = 8;
+    LocalFADT->PmTimerLength = 4;
 
     /*
      * Convert the addresses to V2.0 GAS structures
      */
 
-    AtTbInitGenericAddress (&LocalFADT->XGpe0Block, 0,
-                             (ACPI_PHYSICAL_ADDRESS)   0x12340000);
-    AtTbInitGenericAddress (&LocalFADT->XGpe1Block, 0,
-                             (ACPI_PHYSICAL_ADDRESS)   0x56780000);
+    AtTbInitGenericAddress (&LocalFADT->XGpe0Block, LocalFADT->Gpe0BlockLength,
+                             (ACPI_PHYSICAL_ADDRESS)   0xC0);
+    AtTbInitGenericAddress (&LocalFADT->XGpe1Block, LocalFADT->Gpe1BlockLength,
+                             (ACPI_PHYSICAL_ADDRESS)   0xE0);
 
     AtTbInitGenericAddress (&LocalFADT->XPm1aEventBlock, LocalFADT->Pm1EventLength,
-                             (ACPI_PHYSICAL_ADDRESS)   0x1aaa0000);
+                             (ACPI_PHYSICAL_ADDRESS)   0xF0);
     AtTbInitGenericAddress (&LocalFADT->XPm1bEventBlock, LocalFADT->Pm1EventLength,
                              (ACPI_PHYSICAL_ADDRESS)   0);
     AtTbInitGenericAddress (&LocalFADT->XPm1aControlBlock, LocalFADT->Pm1ControlLength,
@@ -888,7 +888,11 @@ AtGetTableHeader (
     } else if (ACPI_COMPARE_NAME(Type, ACPI_SIG_FADT))
     {
         BldTask.NoTableScale &= ~(BLD_NO_FACS | BLD_NO_DSDT);
+#if ACPI_MACHINE_WIDTH == 64
+        AtBuildLocalFADT2(&LocalFADT, &LocalFACS, &Actual_DSDT, NULL, BldTask);
+#else
         AtBuildLocalFADT1(&LocalFADT, &LocalFACS, &Actual_DSDT, NULL, BldTask);
+#endif
         *Table = (ACPI_TABLE_HEADER *)&LocalFADT;
     } else if (ACPI_COMPARE_NAME(Type, ACPI_SIG_PSDT))
     {
@@ -1310,7 +1314,7 @@ AeRegionHandler (
      * ByteWidth (see above)
      */
     if (((ACPI_INTEGER) Address + ByteWidth) >
-        ((ACPI_INTEGER)(BufferAddress) + Length))
+        ((ACPI_INTEGER)(BaseAddress) + Length))
     {
         ACPI_WARNING ((AE_INFO,
             "Request on [%4.4s] is beyond region limit Req-%X+%X, Base=%X, Len-%X\n",

@@ -693,7 +693,7 @@ AcpiUtDumpAllocations (
     UINT32                  Component,
     const char              *Module)
 {
-    ACPI_DEBUG_MEM_BLOCK    *Element;
+    ACPI_DEBUG_MEM_BLOCK    *Element = NULL;
     ACPI_DESCRIPTOR         *Descriptor;
     UINT32                  NumOutstanding = 0;
     UINT8                   DescriptorType;
@@ -715,7 +715,11 @@ AcpiUtDumpAllocations (
         return_VOID;
     }
 
-    Element = AcpiGbl_GlobalList->ListHead;
+    if (AcpiGbl_GlobalList != NULL)
+    {
+        Element = AcpiGbl_GlobalList->ListHead;
+    }
+
     while (Element)
     {
         if ((Element->Component & Component) &&

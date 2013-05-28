@@ -433,7 +433,8 @@ void
 AcpiDsDeleteResultIfNotUsed (
     ACPI_PARSE_OBJECT       *Op,
     ACPI_OPERAND_OBJECT     *ResultObj,
-    ACPI_WALK_STATE         *WalkState)
+    ACPI_WALK_STATE         *WalkState,
+    ACPI_STATUS             PrevStatus)
 {
     ACPI_OPERAND_OBJECT     *ObjDesc;
     ACPI_STATUS             Status;
@@ -459,6 +460,18 @@ AcpiDsDeleteResultIfNotUsed (
 
         Status = AcpiDsResultPop (&ObjDesc, WalkState);
         if (ACPI_SUCCESS (Status))
+        {
+            AcpiUtRemoveReference (ResultObj);
+        }
+    }
+    else if (ACPI_FAILURE(PrevStatus))
+    {
+        /*
+         * Something went wrong, however result obtaining succeed,
+         * so reference count need to be decrement
+         */
+
+        if (ResultObj)
         {
             AcpiUtRemoveReference (ResultObj);
         }

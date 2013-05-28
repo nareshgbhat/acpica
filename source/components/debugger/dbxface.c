@@ -579,6 +579,9 @@ AcpiDbTerminate (
         AcpiOsFree (AcpiGbl_DbBuffer);
         AcpiGbl_DbBuffer = NULL;
     }
+
+    /* Deinit globals */
+    AcpiGbl_DbOutputFlags = 0;
 }
 
 

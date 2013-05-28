@@ -194,6 +194,11 @@ AcpiInitializeTables (
      */
     if (!InitialTableArray)
     {
+        if (!(AcpiGbl_StartupFlags & ACPI_SUBSYSTEM_INITIALIZE))
+        {
+            return_ACPI_STATUS (AE_NO_MEMORY);
+        }
+
         Status = AcpiAllocateRootTable (InitialTableCount);
         if (ACPI_FAILURE (Status))
         {

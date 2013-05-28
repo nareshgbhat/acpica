@@ -60,6 +60,8 @@ static ACPI_OSXF_EMUL_REG     *RegList;
 
 static ACPI_OSXF_EMUL_REG     *FixedRegs[AtFixeReg_All];
 
+static ACPI_OSXF_QUEUE        *QeueFirst;
+
 /*
  * Initialize AcpiOS* interfaces test control data.
  *
@@ -857,4 +859,77 @@ OsxfCtrlRetError(
         exit(-1);
     }
     return (0);
+}
+
+void
+OsxfCtrlAddQueue(void *Addr)
+{
+    ACPI_OSXF_QUEUE *NewItem, *Iterator;
+
+    NewItem = malloc(sizeof (ACPI_OSXF_QUEUE));
+    NewItem->Addr = Addr;
+    NewItem->Next = NULL;
+    NewItem->Prev = NULL;
+
+    if (QeueFirst == NULL)
+    {
+        QeueFirst = NewItem;
+    }
+    else
+    {
+        Iterator = QeueFirst;
+        while (Iterator->Next)
+        {
+            Iterator = Iterator->Next;
+        }
+        Iterator->Next = NewItem;
+        NewItem->Prev = Iterator;
+    }
+}
+
+BOOLEAN
+OsxfCtrlDelQueue(void *Addr)
+{
+    ACPI_OSXF_QUEUE *Iterator;
+
+    for (Iterator = QeueFirst; Iterator != NULL; Iterator = Iterator->Next)
+    {
+        if (Iterator->Addr == Addr)
+        {
+            if (Iterator->Next)
+            {
+                Iterator->Next->Prev = Iterator->Prev;
+            }
+            if (Iterator->Prev)
+            {
+                Iterator->Prev->Next = Iterator->Next;
+            }
+
+            if (Iterator == QeueFirst)
+            {
+                QeueFirst = Iterator->Next;
+            }
+            free(Iterator);
+            Iterator = NULL;
+            return (TRUE);
+        }
+    }
+
+    return (FALSE);
+}
+
+BOOLEAN
+OsxfCtrlCheckQueue(void *Addr)
+{
+    ACPI_OSXF_QUEUE *Iterator;
+
+    for (Iterator = QeueFirst; Iterator != NULL; Iterator = Iterator->Next)
+    {
+        if (Iterator->Addr == Addr)
+        {
+            return (TRUE);
+        }
+    }
+
+    return (FALSE);
 }

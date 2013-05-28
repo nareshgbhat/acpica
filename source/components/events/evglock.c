@@ -217,6 +217,7 @@ AcpiEvRemoveGlobalLockHandler (
                 AcpiEvGlobalLockHandler);
 
     AcpiOsDeleteLock (AcpiGbl_GlobalLockPendingLock);
+
     return_ACPI_STATUS (Status);
 }
 

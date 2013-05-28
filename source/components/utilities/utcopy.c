@@ -1135,5 +1135,11 @@ AcpiUtCopyIobjectToIobject (
         Status = AcpiUtCopySimpleObject (SourceDesc, *DestDesc);
     }
 
+    if (ACPI_FAILURE(Status))
+    {
+        AcpiUtDeleteObjectDesc (*DestDesc);
+        *DestDesc = NULL;
+    }
+
     return_ACPI_STATUS (Status);
 }

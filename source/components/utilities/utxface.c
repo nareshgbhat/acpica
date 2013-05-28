@@ -146,11 +146,19 @@ AcpiTerminate (
     ACPI_FUNCTION_TRACE (AcpiTerminate);
 
 
-    /* Just exit if subsystem is already shutdown */
+    /* Try to exit if subsystem is shutdown */
 
     if (AcpiGbl_Shutdown)
     {
         ACPI_ERROR ((AE_INFO, "ACPI Subsystem is already terminated"));
+
+        /*
+         * Purge the local caches and terminate OS. Some of caches may be
+         * allocated as well as OS can be initialized even if subsystem is
+         * shutdown, see AcpiInitializeSubsystem() function.
+         */
+        (void) AcpiUtDeleteCaches ();
+        (void) AcpiOsTerminate ();
         return_ACPI_STATUS (AE_OK);
     }
 
@@ -257,6 +265,18 @@ AcpiGetSystemInfo (
     if (ACPI_FAILURE (Status))
     {
         return_ACPI_STATUS (Status);
+    }
+
+    /*
+     * If AcpiInitializeSubsystem routine was successfully executed and buffer
+     * can be allocated.
+     */
+
+    if (!(AcpiGbl_StartupFlags & ACPI_SUBSYSTEM_INITIALIZE) &&
+            ((OutBuffer->Length == ACPI_ALLOCATE_BUFFER) ||
+            (OutBuffer->Length == ACPI_ALLOCATE_LOCAL_BUFFER)))
+    {
+        return_ACPI_STATUS (AE_ERROR);
     }
 
     /* Validate/Allocate/Clear caller buffer */
@@ -370,6 +390,11 @@ AcpiInstallInitializationHandler (
     ACPI_INIT_HANDLER       Handler,
     UINT32                  Function)
 {
+
+    if (!(AcpiGbl_StartupFlags & ACPI_SUBSYSTEM_INITIALIZE))
+    {
+        return (AE_ERROR);
+    }
 
     if (!Handler)
     {
