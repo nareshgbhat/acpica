@@ -1559,6 +1559,7 @@ AtInstallAdrSpaceHandlerCommon(
     UINT32                  ExpectedAdrSpaceHandlerCounter = 0;
     UINT32                  ExpectedAdrSpaceSetupCounter = 0;
     UINT32                  InitStages = AAPITS_INI_DEF & ~AAPITS_INSTALL_HS;
+    UINT32                  EcWidth = 0;
 
     if (ACPI_FAILURE(Status = AtAMLcodeFileNameSet("hndl0016.aml")))
     {
@@ -1623,12 +1624,30 @@ AtInstallAdrSpaceHandlerCommon(
             else if (AT_SKIP_ADR_SPACE_SETUP_HANDLER_CHECK)
             {
                 /* Should be the actual Region object */
-                AccData[i].Object = ((ACPI_NAMESPACE_NODE *)AccData[i].Object)->
-                    Object->CommonField.RegionObj;
+                //AccData[i].Object = ((ACPI_NAMESPACE_NODE *)AccData[i].Object)->
+                    //Object->CommonField.RegionObj;
+                AccData[i].Object = NULL;
             }
             if (AccData[i].RegionSpace == 4 /* SMBus */)
             {
                 AccData[i].NumAcc = 1;
+            }
+            else if (AccData[i].RegionSpace == 3 /* EC */)
+            {
+                /* Full data read/write EC address space */
+                EcWidth = ACPI_ROUND_BITS_UP_TO_BYTES (AccData[i].FieldSize);
+                if (EcWidth > sizeof (UINT64))
+                {
+                    EcWidth = sizeof (UINT64);
+                }
+                EcWidth *= AccData[i].Width;
+
+                AccData[i].NumAcc = (AccData[i].FieldSize +
+                        EcWidth - 1) / EcWidth;
+                if (AccData[i].FieldSize % EcWidth)
+                {   /* Write operation as read/write */
+                    AccData[i].NumAcc++;
+                }
             }
             else
             {
