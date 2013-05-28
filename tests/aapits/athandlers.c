@@ -1723,6 +1723,16 @@ AtInstallAdrSpaceHandlerCommon(
             else if (CheckAction == 5)
             {
                 Handler = ACPI_DEFAULT_HANDLER;
+                if (AccData != NULL)
+                {
+                TestSkipped++;
+                printf ("Test note: physical address mapping not implemented, "
+                        "default handler try to map physical address obtained "
+                        "from DSDT operation region. This test case would "
+                        "need to cover it by dynamically allocated memory "
+                        "and pass virtual addresses to DSDT.\n");
+                return (AE_ERROR);
+                }
             }
 
             Status = AcpiInstallAddressSpaceHandler(Device, SpaceId,
