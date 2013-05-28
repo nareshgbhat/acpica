@@ -267,6 +267,18 @@ AcpiGetSystemInfo (
         return_ACPI_STATUS (Status);
     }
 
+    /*
+     * If AcpiInitializeSubsystem routine was successfully executed and buffer
+     * can be allocated.
+     */
+
+    if (!(AcpiGbl_StartupFlags & ACPI_SUBSYSTEM_INITIALIZE) &&
+            ((OutBuffer->Length == ACPI_ALLOCATE_BUFFER) ||
+            (OutBuffer->Length == ACPI_ALLOCATE_LOCAL_BUFFER)))
+    {
+        return_ACPI_STATUS (AE_ERROR);
+    }
+
     /* Validate/Allocate/Clear caller buffer */
 
     Status = AcpiUtInitializeBuffer (OutBuffer, sizeof (ACPI_SYSTEM_INFO));
@@ -378,6 +390,11 @@ AcpiInstallInitializationHandler (
     ACPI_INIT_HANDLER       Handler,
     UINT32                  Function)
 {
+
+    if (!(AcpiGbl_StartupFlags & ACPI_SUBSYSTEM_INITIALIZE))
+    {
+        return (AE_ERROR);
+    }
 
     if (!Handler)
     {

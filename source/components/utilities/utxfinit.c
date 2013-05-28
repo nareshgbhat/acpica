@@ -150,8 +150,11 @@ AcpiInitializeSubsystem (
     ACPI_FUNCTION_TRACE (AcpiInitializeSubsystem);
 
 
-    AcpiGbl_StartupFlags = ACPI_SUBSYSTEM_INITIALIZE;
     ACPI_DEBUG_EXEC (AcpiUtInitStackPtrTrace ());
+    if (AcpiGbl_StartupFlags & ACPI_SUBSYSTEM_INITIALIZE)
+    {
+        return_ACPI_STATUS (AE_ERROR);
+    }
 
     /* Initialize the OS-Dependent layer */
 
@@ -203,6 +206,10 @@ AcpiInitializeSubsystem (
     /* If configured, initialize the AML debugger */
 
     ACPI_DEBUGGER_EXEC (Status = AcpiDbInitialize ());
+    if (ACPI_SUCCESS (Status))
+    {
+        AcpiGbl_StartupFlags = ACPI_SUBSYSTEM_INITIALIZE;
+    }
     return_ACPI_STATUS (Status);
 }
 
@@ -231,6 +238,11 @@ AcpiEnableSubsystem (
 
     ACPI_FUNCTION_TRACE (AcpiEnableSubsystem);
 
+
+    if (AcpiGbl_StartupFlags ^ (ACPI_SUBSYSTEM_INITIALIZE | ACPI_LOAD_TABLE))
+    {
+        return_ACPI_STATUS (AE_ERROR);
+    }
 
 #if (!ACPI_REDUCED_HARDWARE)
 
@@ -295,6 +307,14 @@ AcpiEnableSubsystem (
      * initialization control methods are run (_REG, _STA, _INI) on the
      * entire namespace.
      */
+
+    /* Make sure events are not already initialized */
+
+    if (AcpiGbl_EventsInitialized == TRUE)
+    {
+        return_ACPI_STATUS (AE_ALREADY_EXISTS);
+    }
+
     if (!(Flags & ACPI_NO_EVENT_INIT))
     {
         ACPI_DEBUG_PRINT ((ACPI_DB_EXEC,
@@ -325,6 +345,8 @@ AcpiEnableSubsystem (
 
 #endif /* !ACPI_REDUCED_HARDWARE */
 
+    AcpiGbl_StartupFlags |= ACPI_SUBSYSTEM_ENABLE;
+
     return_ACPI_STATUS (Status);
 }
 
@@ -353,6 +375,11 @@ AcpiInitializeObjects (
 
     ACPI_FUNCTION_TRACE (AcpiInitializeObjects);
 
+    if (AcpiGbl_StartupFlags ^ (ACPI_SUBSYSTEM_INITIALIZE | ACPI_LOAD_TABLE |
+            ACPI_SUBSYSTEM_ENABLE))
+    {
+        return_ACPI_STATUS (AE_ERROR);
+    }
 
     /*
      * Run all _REG methods

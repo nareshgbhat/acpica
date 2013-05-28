@@ -917,3 +917,19 @@ OsxfCtrlDelQueue(void *Addr)
 
     return (FALSE);
 }
+
+BOOLEAN
+OsxfCtrlCheckQueue(void *Addr)
+{
+    ACPI_OSXF_QUEUE *Iterator;
+
+    for (Iterator = QeueFirst; Iterator != NULL; Iterator = Iterator->Next)
+    {
+        if (Iterator->Addr == Addr)
+        {
+            return (TRUE);
+        }
+    }
+
+    return (FALSE);
+}

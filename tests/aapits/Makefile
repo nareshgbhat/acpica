@@ -1,6 +1,12 @@
 # PROG=	acpiexec
 # SRCS=	aeexec.c aemain.c \
 
+ifndef BUILD_DIRECTORY_PATH
+BUILD_DIRECTORY_PATH = generate/unix
+endif
+
+HARDWARE_NAME := $(shell uname -m)
+
 PROG=	bin/aapits
 SRCS=	atexec.c atmain.c \
 	atinit.c \
@@ -187,12 +193,27 @@ SRCS=	atexec.c atmain.c \
 
 CFLAGS+= -Wall -g -D_LINUX -DNDEBUG -D_CONSOLE -DACPI_EXEC_APP -D_MULTI_THREADED -Wstrict-prototypes -I../../source/include 
 
+LDFLAGS+= -pthread
+
 
 acpiexec : $(patsubst %.c,%.o, $(SRCS))
 	$(CC) $(LDFLAGS) $(patsubst %.c,%.o, $(SRCS)) -o $(PROG)
 
+aml:
+	@if [ $(findstring 64,$(HARDWARE_NAME)) ]; then \
+	make -C asl ASL=../../../${BUILD_DIRECTORY_PATH}/bin64/iasl; \
+	else \
+	make -C asl ASL=../../../${BUILD_DIRECTORY_PATH}/bin32/iasl; \
+	fi;
+
+all: acpiexec aml
+
 CLEANFILES= $(PROG)
 
-clean : 
+clean :
 	rm -f $(CLEANFILES) $(patsubst %.c,%.o, $(SRCS))
+
+distclean:
+	rm -f $(CLEANFILES) $(patsubst %.c,%.o, $(SRCS))
+	make clean -C asl
 

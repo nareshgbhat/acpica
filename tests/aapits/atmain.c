@@ -197,7 +197,6 @@ ExecuteTest (
     TestSkipped = 0;
     TestPass = 0;
     AtAMLcodeFileName = NULL;
-    AtAMLcodeFileDir = NULL;
     NullBldTask = ZeroBldTask;
 
     OsxfCtrlInit();
@@ -220,7 +219,7 @@ ExecuteTest (
 
     printf ("%s:\n", TestName);
 
-    AcpiGbl_EnableInterpreterSlack = TRUE;
+    AcpiGbl_EnableInterpreterSlack = FALSE;
     printf ("AML Interpreter slack mode enabled\n");
 
     AtTestCase[test_case].Tests[test_num]();
@@ -287,6 +286,7 @@ main(
     UINT32                  test_num;
     UINT32                  i;
     UINT32                  j;
+    int                     status;
 
 
     signal (SIGINT, AtSigHandler);
@@ -336,7 +336,7 @@ main(
         AtAMLcodeFileDir = argv[3];
     }
 
-    ExecuteTest (test_case, test_num);
-    return (0);
+    status = ExecuteTest (test_case, test_num);
+    return (status);
 
 }

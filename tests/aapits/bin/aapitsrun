@@ -25,19 +25,33 @@ AAPITSDIR=../tmp
 AAPITSOUT=${AAPITSDIR}/raw.out
 AAPITSSUM=${AAPITSDIR}/sum.out
 
-AT_INIT_TEST_NUM=59
-AT_MEMM_TEST_NUM=0
-AT_HDWM_TEST_NUM=42
-AT_TBLM_TEST_NUM=58
-AT_NSPM_TEST_NUM=126
-AT_RSCM_TEST_NUM=37
-AT_FEVM_TEST_NUM=20
-AT_GPEM_TEST_NUM=48
-AT_HNDM_TEST_NUM=36
+AT_INIT_TEST=1
+AT_MEMM_TEST=2
+AT_HDWM_TEST=3
+AT_TBLM_TEST=4
+AT_NSPM_TEST=5
+AT_RSCM_TEST=6
+AT_FEVM_TEST=7
+AT_GPEM_TEST=8
+AT_HNDM_TEST=9
 
-TESTS_NUMBERS="$AT_INIT_TEST_NUM $AT_MEMM_TEST_NUM $AT_HDWM_TEST_NUM\
-               $AT_TBLM_TEST_NUM $AT_NSPM_TEST_NUM $AT_RSCM_TEST_NUM\
-               $AT_FEVM_TEST_NUM $AT_GPEM_TEST_NUM $AT_HNDM_TEST_NUM"
+AT_INIT_TEST_NUM=61
+AT_MEMM_TEST_NUM=1
+AT_HDWM_TEST_NUM=41
+AT_TBLM_TEST_NUM=62
+AT_NSPM_TEST_NUM=127
+AT_RSCM_TEST_NUM=38
+AT_FEVM_TEST_NUM=19
+AT_GPEM_TEST_NUM=47
+AT_HNDM_TEST_NUM=38
+
+TESTS_ORDER=($AT_INIT_TEST $AT_MEMM_TEST $AT_TBLM_TEST $AT_NSPM_TEST $AT_RSCM_TEST)
+
+TESTS_NUMBERS="$AT_INIT_TEST_NUM $AT_MEMM_TEST_NUM $AT_TBLM_TEST_NUM $AT_NSPM_TEST_NUM $AT_RSCM_TEST_NUM"
+
+#TESTS_NUMBERS="$AT_INIT_TEST_NUM $AT_MEMM_TEST_NUM $AT_HDWM_TEST_NUM\
+#               $AT_TBLM_TEST_NUM $AT_NSPM_TEST_NUM $AT_RSCM_TEST_NUM\
+#               $AT_FEVM_TEST_NUM $AT_GPEM_TEST_NUM $AT_HNDM_TEST_NUM"
 #TESTS_NUMBERS=1
 
 # Check the working directory
@@ -82,7 +96,7 @@ tests_fail=0
 tests_none=0
 tests_fault=0
 
-test_case=0
+test_case=-1
 
 for test_num in $TESTS_NUMBERS
 do
@@ -91,24 +105,28 @@ do
 
 	for (( test=0; test<$test_num; test++ ))
 	do
-		$AAPITS $test_case $test $AAPITSAML 2>&1 >> $AAPITSOUT
+		$AAPITS ${TESTS_ORDER[$test_case]} $test $AAPITSAML 2>&1 >> $AAPITSOUT
 		test_ret=$?
 		if [ $test_ret -eq 0 ]; then
 			tests_pass=$[ tests_pass + 1 ]
+			echo "test ${TESTS_ORDER[$test_case]} $test: pass"
 		elif [ $test_ret -eq 1 ]; then
 			tests_skip1=$[ tests_skip1 + 1 ]
+			echo "test ${TESTS_ORDER[$test_case]} $test: skip"
 		elif [ $test_ret -eq 2 ]; then
 			tests_skip2=$[ tests_skip2 + 1 ]
+			echo "test ${TESTS_ORDER[$test_case]} $test: fail"
 		elif [ $test_ret -eq 3 ]; then
 			tests_fail=$[ tests_fail + 1 ]
+			echo "test ${TESTS_ORDER[$test_case]} $test: fail"
 		elif [ $test_ret -eq 4 ]; then
 			tests_none=$[ tests_none + 1 ]
+			echo "test ${TESTS_ORDER[$test_case]} $test: unknown"
 		else
 			tests_fault=$[ tests_fault + 1 ]
 		fi
-		echo "test $test_case $test: $test_ret"
-		echo "test $test_case $test: $test_ret" >> $AAPITSSUM
-		echo "test $test_case $test: $test_ret" >> $AAPITSOUT
+		echo "test ${TESTS_ORDER[$test_case]} $test: $test_ret" >> $AAPITSSUM
+		echo "test ${TESTS_ORDER[$test_case]} $test: $test_ret" >> $AAPITSOUT
 		echo "" >> $AAPITSOUT
 	done
 

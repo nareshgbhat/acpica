@@ -13,9 +13,9 @@
 
 
 #if ACPI_MACHINE_WIDTH == 64
-#define RT0000_DEV0_CRS_LEN 0xCA0
+#define RT0000_DEV0_CRS_LEN 0x920
 #else
-#define RT0000_DEV0_CRS_LEN 0x8C0
+#define RT0000_DEV0_CRS_LEN 0x8C4
 #endif
 /*
  * ASSERTION 0000:
@@ -488,6 +488,12 @@ ACPI_STATUS
 AtRsrcTest0006(void)
 {
     ACPI_STATUS             Status;
+
+    TestSkipped++;
+    printf("Skip: AtRsrcTest0006() AcpiGetCurrentResources allow for some"
+        " allocation failure, it tries to get as many resources as"
+        " possible\n");
+    return (AE_OK);
 
     if (ACPI_FAILURE(Status = AtAMLcodeFileNameSet("rt0000.aml")))
     {
@@ -980,6 +986,12 @@ AtRsrcTest0013(void)
 {
     ACPI_STATUS             Status;
 
+    TestSkipped++;
+    printf("Skip: AtRsrcTest0013() AcpiGetPossibleResources allow for some"
+        " allocation failure, it tries to get as many resources as"
+        " possible\n");
+    return (AE_OK);
+
     if (ACPI_FAILURE(Status = AtAMLcodeFileNameSet("rt0000.aml")))
     {
         return (Status);
@@ -1434,6 +1446,11 @@ ACPI_STATUS
 AtRsrcTest0020(void)
 {
     ACPI_STATUS             Status;
+
+    TestSkipped++;
+    printf("Skip: AtRsrcTest0020() AcpiSetCurrentResources allow for some"
+        " allocation failure, it tries to walk through as far as possible\n");
+    return (AE_OK);
 
     if (ACPI_FAILURE(Status = AtAMLcodeFileNameSet("rt0000.aml")))
     {
@@ -1921,6 +1938,11 @@ ACPI_STATUS
 AtRsrcTest0027(void)
 {
     ACPI_STATUS             Status;
+
+    TestSkipped++;
+    printf("Skip: AtRsrcTest0027() AcpiGetIrqRoutingTable allow for some"
+        " allocation failure, it tries to walk through as far as possible\n");
+    return (AE_OK);
 
     if (ACPI_FAILURE(Status = AtAMLcodeFileNameSet("rt0000.aml")))
     {

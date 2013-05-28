@@ -152,7 +152,7 @@ DefinitionBlock(
 		Name(_UID, 0)
 		Name(_CID, "PNP0A21")
 		Name(_ADR, 0xF00000001)
-		Name(_STA, 0xFFFFFFFFF)
+		Name(_STA, 0x00000001F)
 		Name(_S1D, 0x01)
 
 		Method(M000)
