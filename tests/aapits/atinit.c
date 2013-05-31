@@ -2625,6 +2625,12 @@ AtInitTest0036(void)
 {
     ACPI_STATUS             Status;
 
+    TestSkipped++;
+    printf ("Test note: even if all caches are empty, "
+        "AcpiPurgeCachedObjects call to the AcpiOs* trying lock operation "
+        "thus we can not expect no call to OS layer.\n");
+    return (AE_ERROR);
+
     Status = AtInitCommonTest(AAPITS_INI_LOAD |
         AAPITS_ENABLE_SS | AAPITS_INITIALIZE_OBJS,
         0, 0,
