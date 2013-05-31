@@ -1719,6 +1719,12 @@ AtInstallAdrSpaceHandlerCommon(
             else if (CheckAction == 3)
             {
                 Handler = NULL;
+                TestSkipped++;
+                printf ("Test note: when the Handler pointer parameter of "
+                        "AcpiInstallAddressSpaceHandler routine is NULL it "
+                        "means that default ones should be used for a given "
+                        "SpaceId.\n");
+                return (AE_ERROR);
             }
             else if (CheckAction == 5)
             {
