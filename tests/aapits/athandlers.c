@@ -2844,6 +2844,7 @@ AtRemoveAdrSpaceHandlerDynReg(
     UINT32                  ExpectedAdrSpaceHandlerCounter = 0;
     UINT32                  ExpectedAdrSpaceSetupCounter = 0;
     UINT32                  InitStages = AAPITS_INI_DEF & ~AAPITS_INSTALL_HS;
+    UINT32                  EcWidth = 0;
 
     if (ACPI_FAILURE(Status = AtAMLcodeFileNameSet("hndl0038.aml")))
     {
@@ -2885,6 +2886,23 @@ AtRemoveAdrSpaceHandlerDynReg(
             {
                 AccData[i].NumAcc = 1;
             }
+            else if (AccData[i].RegionSpace == 3 /* EC */)
+            {
+                /* Full data read/write EC address space */
+                EcWidth = ACPI_ROUND_BITS_UP_TO_BYTES (AccData[i].FieldSize);
+                if (EcWidth > sizeof (UINT64))
+                {
+                    EcWidth = sizeof (UINT64);
+                }
+                EcWidth *= AccData[i].Width;
+
+                AccData[i].NumAcc = (AccData[i].FieldSize +
+                        EcWidth - 1) / EcWidth;
+                if (AccData[i].FieldSize % EcWidth)
+                {   /* Write operation as read/write */
+                    AccData[i].NumAcc++;
+                }
+            }
             else
             {
                 AccData[i].NumAcc = (AccData[i].FieldSize +
@@ -2923,7 +2941,19 @@ AtRemoveAdrSpaceHandlerDynReg(
                 {
                     continue;
                 }
-                TestData[i].InstData[j].NumSetup += 2;
+
+                /*
+                 * Setup handler is called once for dynamic operation regions.
+                 */
+
+                if (strncmp(AccData[ii].RegionName, "\\TST6", 5) == 0)
+                {
+                    TestData[i].InstData[j].NumSetup += 1;
+                }
+                else
+                {
+                    TestData[i].InstData[j].NumSetup += 2;
+                }
            }
             ExpectedAdrSpaceSetupCounter += TestData[i].InstData[j].NumSetup;
 
