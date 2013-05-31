@@ -3769,6 +3769,12 @@ AtInitTest0055(void)
 {
     ACPI_STATUS             Status;
 
+    TestSkipped++;
+    printf("Skip: AtInitTest0055() AcpiInitializeObjects allow for"
+        " some allocation failure, it tries to walk through as far as"
+        " possible\n");
+    return (AE_OK);
+
     /*
      * AcpiOsAllocate returns NULL permanently since the specified call
      */
