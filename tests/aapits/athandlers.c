@@ -2725,6 +2725,8 @@ AtAuxHndlrTest0036(
         return (Status);
     }
 
+    AcpiGbl_RegMethodsExecuted = TRUE;
+
     Status = AcpiInstallAddressSpaceHandler(Device, SpaceId,
         Handler, Setup, Context);
 
@@ -2792,7 +2794,7 @@ AtHndlrTest0036(void)
     {
         return (Status);
     }
-/*
+
     if (ACPI_FAILURE(Status = AtAuxHndlrTest0036(
         "\\PCI1", AE_NOT_EXIST)))
     {
@@ -2804,7 +2806,7 @@ AtHndlrTest0036(void)
     {
         return (Status);
     }
-*/
+
     if (ACPI_FAILURE(Status = AtAuxHndlrTest0036(
         "\\PCI2.DEVB", AE_NOT_EXIST)))
     {
