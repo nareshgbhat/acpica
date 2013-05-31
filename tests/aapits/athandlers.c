@@ -2157,6 +2157,12 @@ AtHndlrTest0026(void)
 {
     ACPI_STATUS             Status;
 
+    TestSkipped++;
+    printf("Skip: AtHndlrTest0026() AcpiInstallAddressSpaceHandler allow for"
+        " some allocation failure, it tries to walk through as far as"
+        " possible\n");
+    return (AE_OK);
+
     if (ACPI_FAILURE(Status = AtAMLcodeFileNameSet("hndl0016.aml")))
     {
         return (Status);
