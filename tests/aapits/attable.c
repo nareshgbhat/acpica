@@ -3163,7 +3163,7 @@ AtTableTest0060(void)
         return (Status);
     }
 
-    AcpiTbInstallTable(UserTable, NULL, AcpiGbl_RootTableList.CurrentTableCount++);
+    AcpiTbInstallTable((ACPI_PHYSICAL_ADDRESS) UserTable, NULL, AcpiGbl_RootTableList.CurrentTableCount++);
 
     /* Caller should unmap the header with AcpiOsUnmapMemory */
     Status = AcpiGetTableHeader(ACPI_SIG_DSDT, 2,
