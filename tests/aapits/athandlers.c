@@ -2009,7 +2009,7 @@ AtHndlrTest0025(void)
     return (AtInstallAdrSpaceHandlerCommon(AdrSpaceTestData0005,
         sizeof (AdrSpaceTestData0005) / sizeof (AT_ADR_SPACE_TEST_DATA),
         NULL, NULL, 0,
-        5, AE_NOT_EXIST));
+        5, AE_BAD_PARAMETER));
 }
 
 ACPI_STATUS
@@ -2606,7 +2606,7 @@ AtHndlrTest0032(void)
     return (AtRemoveAdrSpaceHandlerCommon(AdrSpaceTestData0001,
         sizeof (AdrSpaceTestData0001) / sizeof (AT_ADR_SPACE_TEST_DATA),
         NULL, NULL, 0,
-        2, AE_BAD_PARAMETER));
+        2, AE_NOT_EXIST));
 }
 
 /*
