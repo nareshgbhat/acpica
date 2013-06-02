@@ -392,6 +392,7 @@ main (
     UINT32                  FileType;
 
 
+    ACPI_DEBUG_INITIALIZE (); /* For debug version only */
     printf (ACPI_COMMON_SIGNON ("ACPI Source Code Conversion Utility"));
 
     if (argc < 2)
@@ -405,6 +406,7 @@ main (
     while ((j = AcpiGetopt (argc, argv, "cdhlqsuvy")) != EOF) switch(j)
     {
     case 'l':
+        
         /* Linux code generation */
 
         printf ("Creating Linux source code\n");
@@ -414,6 +416,7 @@ main (
         break;
 
     case 'c':
+        
         /* Cleanup code */
 
         printf ("Code cleanup\n");
@@ -422,6 +425,7 @@ main (
         break;
 
     case 'h':
+
         /* Inject Dual-license header */
 
         printf ("Inserting Dual-license header to all modules\n");
@@ -429,11 +433,13 @@ main (
         break;
 
     case 's':
+
         /* Statistics only */
 
         break;
 
     case 'u':
+
         /* custom conversion  */
 
         printf ("Custom source translation\n");
@@ -441,30 +447,35 @@ main (
         break;
 
     case 'v':
+        
         /* Verbose mode */
 
         Gbl_VerboseMode = TRUE;
         break;
 
     case 'y':
+
         /* Batch mode */
 
         Gbl_BatchMode = TRUE;
         break;
 
     case 'd':
+
         /* Leave debug statements in */
 
         Gbl_DebugStatementsMode = TRUE;
         break;
 
     case 'q':
+
         /* Quiet mode */
 
         Gbl_QuietMode = TRUE;
         break;
 
     default:
+        
         AsDisplayUsage ();
         return (-1);
     }

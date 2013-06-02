@@ -289,6 +289,8 @@ main(
     int                     status;
 
 
+    ACPI_DEBUG_INITIALIZE (); /* For debug version only */
+
     signal (SIGINT, AtSigHandler);
     signal (SIGILL, AtSigHandler);
     signal (SIGFPE, AtSigHandler);
