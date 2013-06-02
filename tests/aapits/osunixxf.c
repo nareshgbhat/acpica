@@ -131,6 +131,7 @@
 #include "acparser.h"
 #include "acdebug.h"
 #include "atosxfwrap.h"
+#include "atosxfctrl.h"
 
 #define _COMPONENT          ACPI_OS_SERVICES
         ACPI_MODULE_NAME    ("osunixxf")
@@ -384,7 +385,6 @@ AcpiOsActualVprintf (
     const char              *Fmt,
     va_list                 Args)
 {
-    INT32                   Count = 0;
     UINT8                   Flags;
 
 
@@ -397,7 +397,7 @@ AcpiOsActualVprintf (
         {
             /* Output file is open, send the output there */
 
-            Count = vfprintf (AcpiGbl_DebugFile, Fmt, Args);
+            vfprintf (AcpiGbl_DebugFile, Fmt, Args);
         }
         else
         {
@@ -409,7 +409,7 @@ AcpiOsActualVprintf (
 
     if (Flags & ACPI_DB_CONSOLE_OUTPUT)
     {
-        Count = vfprintf (AcpiGbl_OutputFile, Fmt, Args);
+        vfprintf (AcpiGbl_OutputFile, Fmt, Args);
     }
 
     return;
@@ -787,7 +787,7 @@ AcpiOsActualExecute (
     void                    *Context)
 {
     pthread_t thread;
-    return (pthread_create(&thread, NULL, Function, Context));
+    return (pthread_create(&thread, NULL, (void *) Function, Context));
 }
 
 

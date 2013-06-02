@@ -118,6 +118,7 @@
 #include "accommon.h"
 #include "acparser.h"
 #include "amlcode.h"
+#include "acdispat.h"
 
 #define _COMPONENT          ACPI_PARSER
         ACPI_MODULE_NAME    ("psobject")

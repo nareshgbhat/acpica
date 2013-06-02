@@ -2154,15 +2154,15 @@ AtRsrcTest0029(void)
 {
     ACPI_STATUS             Status;
 
-    Status = AtWalkResourcesTestCommon("_CRS", AE_CTRL_DEPTH, AE_OK,
-        25, RT0000_DEV0_CRS_LEN);
+    Status = AtWalkResourcesTestCommon("_CRS", AE_CTRL_DEPTH, AE_CTRL_DEPTH,
+        1, 16);
     if (ACPI_FAILURE(Status))
     {
         return (Status);
     }
 
-    Status = AtWalkResourcesTestCommon("_PRS", AE_CTRL_DEPTH, AE_OK,
-        25, RT0000_DEV0_CRS_LEN);
+    Status = AtWalkResourcesTestCommon("_PRS", AE_CTRL_DEPTH, AE_CTRL_DEPTH,
+        1, 16);
     if (ACPI_FAILURE(Status))
     {
         return (Status);
@@ -2469,6 +2469,11 @@ ACPI_STATUS
 AtRsrcTest0034(void)
 {
     ACPI_STATUS             Status;
+
+    TestSkipped++;
+    printf("Skip: AtRsrcTest0034() AcpiWalkResources allow for some"
+        " allocation failure, it tries to walk through as far as possible\n");
+    return (AE_OK);
 
     if (ACPI_FAILURE(Status = AtAMLcodeFileNameSet("rt0000.aml")))
     {
@@ -3040,7 +3045,7 @@ static	UINT8ARR          Buffer0036[] =  {
 		0xeb, 0xea, 0xe9, 0xe8, 0xef, 0xee, 0xed, 0xec,
 		0xf3, 0xf2, 0xf1, 0xf0, 0xf7, 0xf6, 0xf5, 0xf4,
 		0xfb, 0xfa, 0xf9, 0xf8, 0xff, 0xfe, 0xfd, 0xfc, 0x79, 0x00}},
-	{{0x31, 0x00, 0x38, 0x31, 0x04, 0x31, 0x08, 0x38, 0x31, 0x01, 0x30,
+	{{0x31, 0x00, 0x38, 0x31, 0x04, 0x31, 0x08, 0x38, 0x31, 0x01, 0x31, 0x05,
 		0x31, 0x09, 0x38, 0x31, 0x02, 0x38, 0x31, 0x06, 0x38, 0x31, 0x0a, 0x38, 0x79, 0x00}},
 
 
