@@ -458,6 +458,12 @@ AcpiEvInstallSpaceHandler (
         goto UnlockAndExit;
     }
 
+    if (!AcpiIsValidSpaceId (SpaceId))
+    {
+        Status = AE_BAD_PARAMETER;
+        goto UnlockAndExit;
+    }
+
     if (Handler == ACPI_DEFAULT_HANDLER)
     {
         Flags = ACPI_ADDR_HANDLER_DEFAULT_INSTALLED;

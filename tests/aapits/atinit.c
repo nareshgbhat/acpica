@@ -2625,6 +2625,12 @@ AtInitTest0036(void)
 {
     ACPI_STATUS             Status;
 
+    TestSkipped++;
+    printf ("Test note: even if all caches are empty, "
+        "AcpiPurgeCachedObjects call to the AcpiOs* trying lock operation "
+        "thus we can not expect no call to OS layer.\n");
+    return (AE_ERROR);
+
     Status = AtInitCommonTest(AAPITS_INI_LOAD |
         AAPITS_ENABLE_SS | AAPITS_INITIALIZE_OBJS,
         0, 0,
@@ -3762,6 +3768,12 @@ ACPI_STATUS
 AtInitTest0055(void)
 {
     ACPI_STATUS             Status;
+
+    TestSkipped++;
+    printf("Skip: AtInitTest0055() AcpiInitializeObjects allow for"
+        " some allocation failure, it tries to walk through as far as"
+        " possible\n");
+    return (AE_OK);
 
     /*
      * AcpiOsAllocate returns NULL permanently since the specified call
