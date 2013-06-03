@@ -265,6 +265,10 @@
 					</FileConfiguration>
 				</File>
 				<File
+					RelativePath="..\..\source\components\utilities\utbuffer.c"
+					>
+				</File>
+				<File
 					RelativePath="..\..\source\components\utilities\utcache.c"
 					>
 					<FileConfiguration
@@ -373,6 +377,10 @@
 							PreprocessorDefinitions=""
 						/>
 					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\..\source\components\utilities\uterror.c"
+					>
 				</File>
 				<File
 					RelativePath="..\..\source\components\utilities\utexcep.c"
@@ -1236,6 +1244,10 @@
 							PreprocessorDefinitions=""
 						/>
 					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\..\source\compiler\asloptions.c"
+					>
 				</File>
 				<File
 					RelativePath="..\..\source\compiler\aslpredef.c"
@@ -2431,6 +2443,10 @@
 							PreprocessorDefinitions=""
 						/>
 					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\..\source\components\tables\tbprint.c"
+					>
 				</File>
 				<File
 					RelativePath="..\..\source\COMPONENTS\tables\tbutils.c"

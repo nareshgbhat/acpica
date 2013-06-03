@@ -265,6 +265,10 @@
 					</FileConfiguration>
 				</File>
 				<File
+					RelativePath="..\..\source\components\utilities\utbuffer.c"
+					>
+				</File>
+				<File
 					RelativePath="..\..\source\components\utilities\utcache.c"
 					>
 					<FileConfiguration
@@ -373,6 +377,10 @@
 							PreprocessorDefinitions=""
 						/>
 					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\..\source\components\utilities\uterror.c"
+					>
 				</File>
 				<File
 					RelativePath="..\..\source\components\utilities\uteval.c"
@@ -777,6 +785,10 @@
 							PreprocessorDefinitions=""
 						/>
 					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\..\source\components\namespace\nsarguments.c"
+					>
 				</File>
 				<File
 					RelativePath="..\..\source\components\namespace\nsconvert.c"
@@ -2062,6 +2074,10 @@
 							PreprocessorDefinitions=""
 						/>
 					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\..\source\components\tables\tbprint.c"
+					>
 				</File>
 				<File
 					RelativePath="..\..\source\components\tables\tbutils.c"
