@@ -175,6 +175,24 @@ AeInterfaceHandler (
     ACPI_STRING             InterfaceName,
     UINT32                  Supported);
 
+static ACPI_STATUS
+AeInstallEcHandler (
+    ACPI_HANDLE             ObjHandle,
+    UINT32                  Level,
+    void                    *Context,
+    void                    **ReturnValue);
+
+static ACPI_STATUS
+AeInstallPciHandler (
+    ACPI_HANDLE             ObjHandle,
+    UINT32                  Level,
+    void                    *Context,
+    void                    **ReturnValue);
+
+static ACPI_STATUS
+AeInstallDeviceHandlers (
+    void);
+
 #if (!ACPI_REDUCED_HARDWARE)
 static UINT32
 AeEventHandler (
@@ -188,17 +206,17 @@ static char                *TableEvents[] =
 };
 #endif /* !ACPI_REDUCED_HARDWARE */
 
+
 static UINT32               SigintCount = 0;
 static AE_DEBUG_REGIONS     AeRegions;
 BOOLEAN                     AcpiGbl_DisplayRegionAccess = FALSE;
-
 
 /*
  * We will override some of the default region handlers, especially the
  * SystemMemory handler, which must be implemented locally. Do not override
  * the PCI_Config handler since we would like to exercise the default handler
  * code. These handlers are installed "early" - before any _REG methods
- * are executed - since they are special in the sense that tha ACPI spec
+ * are executed - since they are special in the sense that the ACPI spec
  * declares that they must "always be available". Cannot override the
  * DataTable region handler either -- needed for test execution.
  */
@@ -210,26 +228,26 @@ static ACPI_ADR_SPACE_TYPE  DefaultSpaceIdList[] =
 
 /*
  * We will install handlers for some of the various address space IDs.
- * Test one user-defined address space (used by aslts.)
+ * Test one user-defined address space (used by aslts).
  */
 #define ACPI_ADR_SPACE_USER_DEFINED1        0x80
 #define ACPI_ADR_SPACE_USER_DEFINED2        0xE4
 
 static ACPI_ADR_SPACE_TYPE  SpaceIdList[] =
 {
-    ACPI_ADR_SPACE_EC,
     ACPI_ADR_SPACE_SMBUS,
-    ACPI_ADR_SPACE_GSBUS,
-    ACPI_ADR_SPACE_GPIO,
+    ACPI_ADR_SPACE_CMOS,
     ACPI_ADR_SPACE_PCI_BAR_TARGET,
     ACPI_ADR_SPACE_IPMI,
+    ACPI_ADR_SPACE_GPIO,
+    ACPI_ADR_SPACE_GSBUS,
     ACPI_ADR_SPACE_FIXED_HARDWARE,
     ACPI_ADR_SPACE_USER_DEFINED1,
     ACPI_ADR_SPACE_USER_DEFINED2
 };
 
-
 static ACPI_CONNECTION_INFO   AeMyContext;
+
 
 /******************************************************************************
  *
@@ -320,6 +338,7 @@ AeCommonNotifyHandler (
     {
 #if 0
     case 0:
+
         printf ("[AcpiExec] Method Error 0x%X: Results not equal\n", Value);
         if (AcpiGbl_DebugFile)
         {
@@ -327,8 +346,8 @@ AeCommonNotifyHandler (
         }
         break;
 
-
     case 1:
+
         printf ("[AcpiExec] Method Error: Incorrect numeric result\n");
         if (AcpiGbl_DebugFile)
         {
@@ -336,8 +355,8 @@ AeCommonNotifyHandler (
         }
         break;
 
-
     case 2:
+
         printf ("[AcpiExec] Method Error: An operand was overwritten\n");
         if (AcpiGbl_DebugFile)
         {
@@ -348,6 +367,7 @@ AeCommonNotifyHandler (
 #endif
 
     default:
+
         printf ("[AcpiExec] Handler %u: Received a %s Notify on [%4.4s] %p Value 0x%2.2X (%s)\n",
             HandlerId, Type, AcpiUtGetNodeName (Device), Device, Value,
             AcpiUtGetNotifyName (Value));
@@ -615,14 +635,17 @@ AeGlobalEventHandler (
     switch (Type)
     {
     case ACPI_EVENT_TYPE_GPE:
+
         TypeName = "GPE";
         break;
 
     case ACPI_EVENT_TYPE_FIXED:
+
         TypeName = "FixedEvent";
         break;
 
     default:
+
         TypeName = "UNKNOWN";
         break;
     }
@@ -724,6 +747,93 @@ AeRegionInit (
 }
 
 
+/*******************************************************************************
+ *
+ * FUNCTION:    AeInstallDeviceHandlers, AeInstallEcHandler,
+ *              AeInstallPciHandler
+ *
+ * PARAMETERS:  ACPI_WALK_NAMESPACE callback
+ *
+ * RETURN:      Status
+ *
+ * DESCRIPTION: Walk entire namespace, install a handler for every EC
+ *              device found.
+ *
+ ******************************************************************************/
+
+static ACPI_STATUS
+AeInstallEcHandler (
+    ACPI_HANDLE             ObjHandle,
+    UINT32                  Level,
+    void                    *Context,
+    void                    **ReturnValue)
+{
+    ACPI_STATUS             Status;
+
+
+    /* Install the handler for this EC device */
+
+    Status = AcpiInstallAddressSpaceHandler (ObjHandle, ACPI_ADR_SPACE_EC,
+        AeRegionHandler, AeRegionInit, &AeMyContext);
+    if (ACPI_FAILURE (Status))
+    {
+        ACPI_EXCEPTION ((AE_INFO, Status,
+            "Could not install an OpRegion handler for EC device (%p)",
+            ObjHandle));
+    }
+
+    return (Status);
+}
+
+static ACPI_STATUS
+AeInstallPciHandler (
+    ACPI_HANDLE             ObjHandle,
+    UINT32                  Level,
+    void                    *Context,
+    void                    **ReturnValue)
+{
+    ACPI_STATUS             Status;
+
+
+    /* Install memory and I/O handlers for the PCI device */
+
+    Status = AcpiInstallAddressSpaceHandler (ObjHandle, ACPI_ADR_SPACE_SYSTEM_IO,
+        AeRegionHandler, AeRegionInit, &AeMyContext);
+    if (ACPI_FAILURE (Status))
+    {
+        ACPI_EXCEPTION ((AE_INFO, Status,
+            "Could not install an OpRegion handler for PCI device (%p)",
+            ObjHandle));
+    }
+
+    Status = AcpiInstallAddressSpaceHandler (ObjHandle, ACPI_ADR_SPACE_SYSTEM_MEMORY,
+        AeRegionHandler, AeRegionInit, &AeMyContext);
+    if (ACPI_FAILURE (Status))
+    {
+        ACPI_EXCEPTION ((AE_INFO, Status,
+            "Could not install an OpRegion handler for PCI device (%p)",
+            ObjHandle));
+    }
+
+    return (AE_CTRL_TERMINATE);
+}
+
+static ACPI_STATUS
+AeInstallDeviceHandlers (
+    void)
+{
+
+    /* Find all Embedded Controller devices */
+
+    AcpiGetDevices ("PNP0C09", AeInstallEcHandler, NULL, NULL);
+
+    /* Install a PCI handler */
+
+    AcpiGetDevices ("PNP0A08", AeInstallPciHandler, NULL, NULL);
+    return (AE_OK);
+}
+
+
 /******************************************************************************
  *
  * FUNCTION:    AeInstallLateHandlers
@@ -761,8 +871,16 @@ AeInstallLateHandlers (
     AeMyContext.AccessLength = 0xA5;
 
     /*
+     * We will install a handler for each EC device, directly under the EC
+     * device definition. This is unlike the other handlers which we install
+     * at the root node. Also install memory and I/O handlers at any PCI
+     * devices.
+     */
+    AeInstallDeviceHandlers ();
+
+    /*
      * Install handlers for some of the "device driver" address spaces
-     * such as EC, SMBus, etc.
+     * such as SMBus, etc.
      */
     for (i = 0; i < ACPI_ARRAY_LENGTH (SpaceIdList); i++)
     {
@@ -1115,6 +1233,7 @@ AeRegionHandler (
             break;
 
         default:
+
             Status = AE_BAD_PARAMETER;
             break;
         }
@@ -1139,24 +1258,27 @@ AeRegionHandler (
         switch (Function & ACPI_IO_MASK)
         {
         case ACPI_READ:
+
             switch (Function >> 16)
             {
             case AML_FIELD_ATTRIB_QUICK:
             case AML_FIELD_ATTRIB_SEND_RCV:
             case AML_FIELD_ATTRIB_BYTE:
+                
                 Length = 1;
                 break;
 
             case AML_FIELD_ATTRIB_WORD:
             case AML_FIELD_ATTRIB_WORD_CALL:
+
                 Length = 2;
                 break;
 
             case AML_FIELD_ATTRIB_BLOCK:
             case AML_FIELD_ATTRIB_BLOCK_CALL:
+
                 Length = 32;
                 break;
-
 
             case AML_FIELD_ATTRIB_MULTIBYTE:
             case AML_FIELD_ATTRIB_RAW_BYTES:
@@ -1167,11 +1289,13 @@ AeRegionHandler (
                 break;
 
             default:
+
                 break;
             }
             break;
 
         case ACPI_WRITE:
+
             switch (Function >> 16)
             {
             case AML_FIELD_ATTRIB_QUICK:
@@ -1179,6 +1303,7 @@ AeRegionHandler (
             case AML_FIELD_ATTRIB_BYTE:
             case AML_FIELD_ATTRIB_WORD:
             case AML_FIELD_ATTRIB_BLOCK:
+
                 Length = 0;
                 break;
 
@@ -1199,11 +1324,13 @@ AeRegionHandler (
                 break;
 
             default:
+
                 break;
             }
             break;
 
         default:
+
             break;
         }
 
@@ -1402,6 +1529,7 @@ DoFunction:
         break;
 
     default:
+
         return (AE_BAD_PARAMETER);
     }
 
@@ -1432,6 +1560,7 @@ DoFunction:
             break;
 
         default:
+
             break;
         }
     }
