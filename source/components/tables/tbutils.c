@@ -593,7 +593,12 @@ AcpiTbParseRootTable (
             /* There is no more room in the root table array, attempt resize */
 
             Status = AcpiTbResizeRootTableList ();
-            if (ACPI_FAILURE (Status))
+            if (Status == AE_NO_MEMORY)
+            {
+                AcpiOsUnmapMemory (Table, Length);
+                return_ACPI_STATUS (Status);
+            }
+            else if (ACPI_FAILURE (Status))
             {
                 ACPI_WARNING ((AE_INFO, "Truncating %u table entries!",
                     (unsigned) (TableCount -

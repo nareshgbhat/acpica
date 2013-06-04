@@ -197,14 +197,13 @@ ExecuteTest (
     TestSkipped = 0;
     TestPass = 0;
     AtAMLcodeFileName = NULL;
-    AtAMLcodeFileDir = NULL;
     NullBldTask = ZeroBldTask;
 
     OsxfCtrlInit();
 
     if (!AtTestCase[test_case].Tests[test_num])
     {
-        printf ("ACPICA API TS err: test num %ld of test case %ld"
+        printf ("ACPICA API TS err: test num %d of test case %d"
             " is not implemented\n",
             test_num, test_case);
         return (AtRetNotImpl);
@@ -220,7 +219,7 @@ ExecuteTest (
 
     printf ("%s:\n", TestName);
 
-    AcpiGbl_EnableInterpreterSlack = TRUE;
+    AcpiGbl_EnableInterpreterSlack = FALSE;
     printf ("AML Interpreter slack mode enabled\n");
 
     AtTestCase[test_case].Tests[test_num]();
@@ -287,6 +286,7 @@ main(
     UINT32                  test_num;
     UINT32                  i;
     UINT32                  j;
+    int                     status;
 
 
     ACPI_DEBUG_INITIALIZE (); /* For debug version only */
@@ -320,7 +320,7 @@ main(
     test_case = strtoul (argv[1], NULL, 0);
     if (test_case < 1 || test_case > AT_TEST_CASE_NUM)
     {
-        printf ("ACPICA API TS err: test case %ld is out of range 1 - %d\n",
+        printf ("ACPICA API TS err: test case %d is out of range 1 - %d\n",
             test_case, AT_TEST_CASE_NUM);
         return (AtRetBadParam);
     }
@@ -328,7 +328,7 @@ main(
     test_num = strtoul (argv[2], NULL, 0);
     if (test_num < 0 || test_num > AtTestCase[test_case].TestsNum)
     {
-        printf ("ACPICA API TS err: test num %ld is out of range 0 - %d\n",
+        printf ("ACPICA API TS err: test num %d is out of range 0 - %d\n",
             test_num, AtTestCase[test_case].TestsNum);
         return (AtRetBadParam);
     }
@@ -338,7 +338,7 @@ main(
         AtAMLcodeFileDir = argv[3];
     }
 
-    ExecuteTest (test_case, test_num);
-    return (0);
+    status = ExecuteTest (test_case, test_num);
+    return (status);
 
 }

@@ -118,6 +118,7 @@
 #include "accommon.h"
 #include "acparser.h"
 #include "amlcode.h"
+#include "acdispat.h"
 
 #define _COMPONENT          ACPI_PARSER
         ACPI_MODULE_NAME    ("psobject")
@@ -485,7 +486,7 @@ AcpiPsCompleteOp (
     ACPI_STATUS             Status)
 {
     ACPI_STATUS             Status2;
-
+    ACPI_OPERAND_OBJECT     *ObjDesc;
 
     ACPI_FUNCTION_TRACE_PTR (PsCompleteOp, WalkState);
 
@@ -608,6 +609,18 @@ AcpiPsCompleteOp (
                     return_ACPI_STATUS (Status2);
                 }
             }
+
+            do
+            {
+                /* Pop and delete remaining object from result stack */
+
+                Status2 = AcpiDsResultPop (&ObjDesc, WalkState);
+                if (ACPI_SUCCESS (Status2))
+                {
+                    AcpiUtRemoveReference (ObjDesc);
+                }
+
+            } while ((ObjDesc) && ACPI_SUCCESS (Status2));
 
             AcpiPsPopScope (&(WalkState->ParserState), Op,
                 &WalkState->ArgTypes, &WalkState->ArgCount);

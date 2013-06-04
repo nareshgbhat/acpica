@@ -219,6 +219,7 @@ AcpiEvGpeInitialize (
         {
             ACPI_EXCEPTION ((AE_INFO, Status,
                 "Could not create GPE Block 0"));
+            goto Cleanup;
         }
     }
 
@@ -258,6 +259,7 @@ AcpiEvGpeInitialize (
             {
                 ACPI_EXCEPTION ((AE_INFO, Status,
                     "Could not create GPE Block 1"));
+                goto Cleanup;
             }
 
             /*
@@ -294,7 +296,7 @@ AcpiEvGpeInitialize (
 
 Cleanup:
     (void) AcpiUtReleaseMutex (ACPI_MTX_NAMESPACE);
-    return_ACPI_STATUS (AE_OK);
+    return_ACPI_STATUS (Status);
 }
 
 

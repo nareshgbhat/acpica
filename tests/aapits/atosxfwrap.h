@@ -72,7 +72,7 @@ ACPI_STATUS
 AcpiOsActualCreateLock (
     ACPI_HANDLE             *OutHandle);
 
-void
+ACPI_STATUS
 AcpiOsActualDeleteLock (
     ACPI_HANDLE             Handle);
 

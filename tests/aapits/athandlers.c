@@ -435,7 +435,7 @@ AtInstallNotifyHandlerCommon(
 
             for (j = 0; j < TestData[i].NotifyHandlerNum; j++)
             {
-                Type = (j)? ACPI_DEVICE_NOTIFY: ACPI_SYSTEM_NOTIFY;
+                Type = (j)? ACPI_SYSTEM_NOTIFY : ACPI_DEVICE_NOTIFY;
                 Handler = TestData[i].Handler[
                     (j + 1) % TestData[i].NotifyHandlerNum];
                 Context = NULL;
@@ -1096,7 +1096,7 @@ AtHndlrTest0015(void)
 {
     return (AtRemoveNotifyHandlerCommon("\\TST0", NotifyTestData0001,
         sizeof (NotifyTestData0001) / sizeof (AT_NOTIFY_TEST_DATA),
-        5, AE_BAD_PARAMETER));
+        5, AE_NOT_EXIST));
 }
 
 #define AT_NUM_ADR_SPACE_ID   7
@@ -1559,6 +1559,7 @@ AtInstallAdrSpaceHandlerCommon(
     UINT32                  ExpectedAdrSpaceHandlerCounter = 0;
     UINT32                  ExpectedAdrSpaceSetupCounter = 0;
     UINT32                  InitStages = AAPITS_INI_DEF & ~AAPITS_INSTALL_HS;
+    UINT32                  EcWidth = 0;
 
     if (ACPI_FAILURE(Status = AtAMLcodeFileNameSet("hndl0016.aml")))
     {
@@ -1623,12 +1624,30 @@ AtInstallAdrSpaceHandlerCommon(
             else if (AT_SKIP_ADR_SPACE_SETUP_HANDLER_CHECK)
             {
                 /* Should be the actual Region object */
-                AccData[i].Object = ((ACPI_NAMESPACE_NODE *)AccData[i].Object)->
-                    Object->CommonField.RegionObj;
+                //AccData[i].Object = ((ACPI_NAMESPACE_NODE *)AccData[i].Object)->
+                    //Object->CommonField.RegionObj;
+                AccData[i].Object = NULL;
             }
             if (AccData[i].RegionSpace == 4 /* SMBus */)
             {
                 AccData[i].NumAcc = 1;
+            }
+            else if (AccData[i].RegionSpace == 3 /* EC */)
+            {
+                /* Full data read/write EC address space */
+                EcWidth = ACPI_ROUND_BITS_UP_TO_BYTES (AccData[i].FieldSize);
+                if (EcWidth > sizeof (UINT64))
+                {
+                    EcWidth = sizeof (UINT64);
+                }
+                EcWidth *= AccData[i].Width;
+
+                AccData[i].NumAcc = (AccData[i].FieldSize +
+                        EcWidth - 1) / EcWidth;
+                if (AccData[i].FieldSize % EcWidth)
+                {   /* Write operation as read/write */
+                    AccData[i].NumAcc++;
+                }
             }
             else
             {
@@ -1700,10 +1719,26 @@ AtInstallAdrSpaceHandlerCommon(
             else if (CheckAction == 3)
             {
                 Handler = NULL;
+                TestSkipped++;
+                printf ("Test note: when the Handler pointer parameter of "
+                        "AcpiInstallAddressSpaceHandler routine is NULL it "
+                        "means that default ones should be used for a given "
+                        "SpaceId.\n");
+                return (AE_ERROR);
             }
             else if (CheckAction == 5)
             {
                 Handler = ACPI_DEFAULT_HANDLER;
+                if (AccData != NULL)
+                {
+                TestSkipped++;
+                printf ("Test note: physical address mapping not implemented, "
+                        "default handler try to map physical address obtained "
+                        "from DSDT operation region. This test case would "
+                        "need to cover it by dynamically allocated memory "
+                        "and pass virtual addresses to DSDT.\n");
+                return (AE_ERROR);
+                }
             }
 
             Status = AcpiInstallAddressSpaceHandler(Device, SpaceId,
@@ -1974,7 +2009,7 @@ AtHndlrTest0025(void)
     return (AtInstallAdrSpaceHandlerCommon(AdrSpaceTestData0005,
         sizeof (AdrSpaceTestData0005) / sizeof (AT_ADR_SPACE_TEST_DATA),
         NULL, NULL, 0,
-        5, AE_NOT_EXIST));
+        5, AE_BAD_PARAMETER));
 }
 
 ACPI_STATUS
@@ -2121,6 +2156,12 @@ ACPI_STATUS
 AtHndlrTest0026(void)
 {
     ACPI_STATUS             Status;
+
+    TestSkipped++;
+    printf("Skip: AtHndlrTest0026() AcpiInstallAddressSpaceHandler allow for"
+        " some allocation failure, it tries to walk through as far as"
+        " possible\n");
+    return (AE_OK);
 
     if (ACPI_FAILURE(Status = AtAMLcodeFileNameSet("hndl0016.aml")))
     {
@@ -2571,7 +2612,7 @@ AtHndlrTest0032(void)
     return (AtRemoveAdrSpaceHandlerCommon(AdrSpaceTestData0001,
         sizeof (AdrSpaceTestData0001) / sizeof (AT_ADR_SPACE_TEST_DATA),
         NULL, NULL, 0,
-        2, AE_BAD_PARAMETER));
+        2, AE_NOT_EXIST));
 }
 
 /*
@@ -2684,6 +2725,8 @@ AtAuxHndlrTest0036(
         return (Status);
     }
 
+    AcpiGbl_RegMethodsExecuted = TRUE;
+
     Status = AcpiInstallAddressSpaceHandler(Device, SpaceId,
         Handler, Setup, Context);
 
@@ -2751,7 +2794,7 @@ AtHndlrTest0036(void)
     {
         return (Status);
     }
-/*
+
     if (ACPI_FAILURE(Status = AtAuxHndlrTest0036(
         "\\PCI1", AE_NOT_EXIST)))
     {
@@ -2763,7 +2806,7 @@ AtHndlrTest0036(void)
     {
         return (Status);
     }
-*/
+
     if (ACPI_FAILURE(Status = AtAuxHndlrTest0036(
         "\\PCI2.DEVB", AE_NOT_EXIST)))
     {
@@ -2801,6 +2844,7 @@ AtRemoveAdrSpaceHandlerDynReg(
     UINT32                  ExpectedAdrSpaceHandlerCounter = 0;
     UINT32                  ExpectedAdrSpaceSetupCounter = 0;
     UINT32                  InitStages = AAPITS_INI_DEF & ~AAPITS_INSTALL_HS;
+    UINT32                  EcWidth = 0;
 
     if (ACPI_FAILURE(Status = AtAMLcodeFileNameSet("hndl0038.aml")))
     {
@@ -2842,6 +2886,23 @@ AtRemoveAdrSpaceHandlerDynReg(
             {
                 AccData[i].NumAcc = 1;
             }
+            else if (AccData[i].RegionSpace == 3 /* EC */)
+            {
+                /* Full data read/write EC address space */
+                EcWidth = ACPI_ROUND_BITS_UP_TO_BYTES (AccData[i].FieldSize);
+                if (EcWidth > sizeof (UINT64))
+                {
+                    EcWidth = sizeof (UINT64);
+                }
+                EcWidth *= AccData[i].Width;
+
+                AccData[i].NumAcc = (AccData[i].FieldSize +
+                        EcWidth - 1) / EcWidth;
+                if (AccData[i].FieldSize % EcWidth)
+                {   /* Write operation as read/write */
+                    AccData[i].NumAcc++;
+                }
+            }
             else
             {
                 AccData[i].NumAcc = (AccData[i].FieldSize +
@@ -2880,7 +2941,19 @@ AtRemoveAdrSpaceHandlerDynReg(
                 {
                     continue;
                 }
-                TestData[i].InstData[j].NumSetup += 2;
+
+                /*
+                 * Setup handler is called once for dynamic operation regions.
+                 */
+
+                if (strncmp(AccData[ii].RegionName, "\\TST6", 5) == 0)
+                {
+                    TestData[i].InstData[j].NumSetup += 1;
+                }
+                else
+                {
+                    TestData[i].InstData[j].NumSetup += 2;
+                }
            }
             ExpectedAdrSpaceSetupCounter += TestData[i].InstData[j].NumSetup;
 

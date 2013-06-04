@@ -12,19 +12,19 @@
         ACPI_MODULE_NAME    ("atnamespace")
 
 static ACPI_STRING      Level0TypeNames0000[] = {
+    "\\_GPE",
     "\\_REV",
-    "\\_REV",
-    "\\STR0",
+    "\\_OS_",
     "\\BUF0",
     "\\PAC0",
     "\\FLU0",
-    "\\DEV0",
+    "\\_SB_",
     "\\EVE0",
-    "\\MMM0",
-    "\\MTX0",
+    "\\_OSI",
+    "\\_GL_",
     "\\OPR0",
     "\\PWR0",
-    "\\CPU0",
+    "\\AUX0",
     "\\TZN0",
     "\\BFL0",
 };
@@ -406,23 +406,23 @@ typedef struct at_device_info
 } AT_DEVICE_INFO;
 
 static AT_DEVICE_INFO   DeviceInfo0000[] = {
-    {0x3f, 0xffffffff, ULL_CONST(0xf00000001),
+    {0x6f, 0x0000001f, ULL_CONST(0xf00000001),
         "PNP0A01", "0", 0xffffff01, 1},
-    {0x3f, 0xffffffff, ULL_CONST(0xf00000002),
+    {0x6f, 0xffffffff, ULL_CONST(0xf00000002),
         "PNP0A02", "1", 0xffff02ff, 1},
-    {0x3f, 0xffffffef, ULL_CONST(0xf00000003),
+    {0x6f, 0xffffffef, ULL_CONST(0xf00000003),
         "ACPI0A03", "d3l0_UID", 0xff03ffff, 2},
-    {0x3d, 0x0ffffff7, ULL_CONST(0xf00000004),
+    {0x6d, 0x0ffffff7, ULL_CONST(0xf00000004),
         "PNP0A04", "999999999", 0x04ffffff, 1},
-    {0x3f, 0x00fffffb, ULL_CONST(0xf00000005),
-        "PNP0A05", "100000000", 0xffffffff, 1},
-    {0x2f, 0x000ffffd, ULL_CONST(0xf00000006),
+    {0x2f, 0x00fffffb, ULL_CONST(0xf00000005),
+        "PNP0A05", "1000000000", 0xffffffff, 1},
+    {0x4f, 0x000ffffd, ULL_CONST(0xf00000006),
         "PNP0A06", "d6l0_UID", 0x01020304, 1},
-    {0x37, 0x0000ffff, ULL_CONST(0xf00000007),
+    {0x67, 0x0000ffff, ULL_CONST(0xf00000007),
         "ACPI0A07", "", 0xff02ff01, 3},
-    {0x3b, 0x0000fffe, ULL_CONST(0xf00000008),
+    {0x6b, 0x0000fffe, ULL_CONST(0xf00000008),
         "PNP0A08", "d8l0_UID", 0xd1e2f3ff, 1},
-    {0x3f, 0x00000000, ULL_CONST(0xf00000009),
+    {0x2f, 0x00000000, ULL_CONST(0xf00000009),
         "PNP0A09", "d9l0_UID", 0xffffffff, 7},
 };
 
@@ -693,12 +693,12 @@ AtEvaluateObjectCommon(
     case 2:
         Name = PathName;
         strcpy(Name, ObjName);
-        Name[strlen(Name) - 1] = '\0';
+        Name[strlen(Name) - 5] = '!';
         break;
     case 8:
         Name = PathName;
         strcpy(Name, ScopePath);
-        Name[strlen(Name) - 1] = '\0';
+        Name[strlen(Name) - 5] = '!';
         strcat(Name, ".");
         strcat(Name, ObjName);
         break;
@@ -706,7 +706,8 @@ AtEvaluateObjectCommon(
         Name = NULL;
         break;
     case 4:
-        ReturnObjectPointer->Length = 1;
+        ReturnObjectPointer->Length =
+            ACPI_ROUND_UP_TO_NATIVE_WORD (sizeof (ACPI_OBJECT));
         ReturnObjectPointer->Pointer = NULL;
         break;
     case 5:
@@ -1007,6 +1008,15 @@ AtEvaluateObjectMethodArgCommon(UINT32 MoreArgs)
 #define OUT_BUF_LEN         8
     UINT8                   OutBuffer[OUT_BUF_LEN];
     UINT32                  Length = sizeof (ACPI_OBJECT) + OUT_BUF_LEN;
+
+    if (MoreArgs)
+    {
+        TestSkipped++;
+        printf("Skip: AtEvaluateObjectMethodArgCommon() ACPICA not allow to"
+                " pass more than the maximum number of 7 arguments to a method,"
+                " it returns AE_LIMIT\n");
+        return (AE_OK);
+    }
 
     if (ACPI_FAILURE(Status = AtAMLcodeFileNameSet("nmsp0000.aml")))
     {
@@ -1318,7 +1328,7 @@ AtNSpaceTest0005(void)
 
     if (AcpiGbl_EnableInterpreterSlack)
     {
-        ExpectedLength = 16;
+        ExpectedLength = sizeof (ACPI_OBJECT);
     }
 
     if (ReturnObject.Length != ExpectedLength)
@@ -1465,6 +1475,13 @@ AtEvaluateObjectExceptionCommon(
             ParameterObjects, &ReturnBuffer,
             ExpectedStatus, 0, CheckAction);
     }
+    else if (CheckAction == 2)
+    {
+        Status = AtEvaluateObjectCommon(
+            NULL, "\\D1L1.D2L0.D3L0.D4L_.D5L0.L4__",
+            ParameterObjects, &ReturnBuffer,
+            ExpectedStatus, 0, CheckAction);
+    }
     else
     {
         Status = AtEvaluateObjectCommon(
@@ -1529,6 +1546,11 @@ AtNSpaceTest0010(void)
 {
     ACPI_STATUS             Status;
 
+    TestSkipped++;
+    printf("Skip: AtNSpaceTest0010() iASL can not generate bad opcode"
+            " even with -f option\n");
+    return (AE_OK);
+
     if (ACPI_FAILURE(Status = AtAMLcodeFileNameSet("nmsp0010.aml")))
     {
         return (Status);
@@ -1587,7 +1609,7 @@ AtNSpaceTest0011(void)
 
     Status = AtEvaluateObjectCommon(
         NULL, "\\M000", NULL, NULL,
-        AE_AML_NO_OPERAND, 0, 0);
+        AE_AML_NO_RETURN_VALUE, 0, 0);
     if (ACPI_FAILURE(Status))
     {
         return (Status);
@@ -1805,6 +1827,11 @@ AtNSpaceTest0019(void)
 ACPI_STATUS
 AtNSpaceTest0020(void)
 {
+    TestSkipped++;
+    printf("Skip: AtNSpaceTest0020() AML allow to create string longer than "
+            "200 characters\n");
+    return (AE_OK);
+
     return (AtEvaluateObjectMethodException1(
         "nmsp0020.aml",
         "\\M000", AE_AML_STRING_LIMIT,
@@ -1835,7 +1862,7 @@ AtNSpaceTest0022(void)
 
     return (AtEvaluateObjectMethodException1(
         "nmsp0022.aml",
-        "\\M000", AE_AML_BAD_NAME,
+        "\\M000", AE_NOT_FOUND,
         "\\I000", 0x0));
 }
 
@@ -1850,7 +1877,7 @@ AtNSpaceTest0023(void)
 
     return (AtEvaluateObjectMethodException1(
         "nmsp0023.aml",
-        "\\M000", AE_AML_NAME_NOT_FOUND,
+        "\\M000", AE_NOT_FOUND,
         "\\I000", 0x0));
 }
 
@@ -1863,7 +1890,7 @@ AtNSpaceTest0025(void)
 {
     return (AtEvaluateObjectMethodException1(
         "nmsp0025.aml",
-        "\\M000", AE_AML_INTERNAL,
+        "\\M000", AE_AML_OPERAND_TYPE,
         "\\I000", 0x0));
 }
 
@@ -1874,7 +1901,7 @@ AtNSpaceTest0025(void)
 ACPI_STATUS
 AtNSpaceTest0026(void)
 {
-    return (AtEvaluateObjectExceptionCommon(1, AE_BAD_CHARACTER));
+    return (AtEvaluateObjectExceptionCommon(1, AE_NOT_FOUND));
 }
 
 /*
@@ -1932,7 +1959,7 @@ AtNSpaceTest0031(void)
 ACPI_STATUS
 AtNSpaceTest0032(void)
 {
-    return (AtEvaluateObjectExceptionCommon(4, AE_BAD_PARAMETER));
+    return (AtEvaluateObjectExceptionCommon(4, AE_NO_MEMORY));
 }
 
 /*
@@ -2051,6 +2078,12 @@ ACPI_STATUS
 AtNSpaceTest0035(void)
 {
     ACPI_STATUS             Status;
+
+    TestSkipped++;
+    printf("Skip: AtNSpaceTest0035() AcpiEvaluateObject allow for some"
+            "allocation failure during object evaluation as long as job can be"
+            "completed\n");
+    return (AE_OK);
 
     if (ACPI_FAILURE(Status = AtAMLcodeFileNameSet("nmsp0000.aml")))
     {
@@ -2240,7 +2273,7 @@ AtNSpaceTest0037(void)
 {
     return (AtEvaluateObjectMethodException1(
         "nmsp0037.aml",
-        "\\M000", AE_NULL_OBJECT,
+        "\\M000", AE_NOT_FOUND,
         "\\I000", 0x0));
 }
 
@@ -2253,7 +2286,6 @@ AtGetObjectInfoCommon(
 {
     ACPI_STATUS             Status;
     ACPI_HANDLE             ObjHandle;
-    ACPI_DEVICE_INFO        *LocalInfo;
 
 
     if (CheckAction == 3 && ACPI_FAILURE(Status = AtAuxiliarySsdt(AT_LOAD)))
@@ -2293,13 +2325,9 @@ AtGetObjectInfoCommon(
             return (Status);
         }
         break;
-    case 4:
-        *Info = NULL;
-        break;
     }
 
-    Status = AcpiGetObjectInfo (ObjHandle, &LocalInfo);
-    *Info = LocalInfo;
+    Status = AcpiGetObjectInfo (ObjHandle, CheckAction != 4 ? Info : NULL);
 
     if (Status != ExpectedStatus)
     {
@@ -2396,7 +2424,8 @@ AtGetObjectInfoTypeCommon(
             return (AE_ERROR);
         }
 
-        if (Info->Type != ACPI_TYPE_DEVICE && Info->Valid != 0)
+        if (Info->Type != ACPI_TYPE_DEVICE &&
+            (Info->Valid & ~ACPI_VALID_STA) != 0)
         {
             AapiErrors++;
             printf ("API Error: Valid of %s (%d) != (%d)\n",
@@ -2488,7 +2517,7 @@ AtGetObjectInfoTypeCommon(
             }
         }
 
-        AcpiOsFree(Info);
+        ACPI_FREE (Info);
 //        ReturnObjBuffer = ReturnBuffer;
     }
 
@@ -2705,6 +2734,11 @@ AtNSpaceTest0044(void)
 {
     ACPI_STATUS             Status;
     ACPI_STRING             Node = "\\D1L1.D2L0.D3L0.D4L_.D5L0";
+
+    TestSkipped++;
+    printf("Skip: AtNSpaceTest0044() AcpiGetObjectInfo allow for some"
+            "allocation failure, it tries to get as many info as possible\n");
+    return (AE_OK);
 
     if (ACPI_FAILURE(Status = AtAMLcodeFileNameSet("nmsp0000.aml")))
     {
@@ -4353,7 +4387,7 @@ AtGetHandleExceptionCommon(
 ACPI_STATUS
 AtNSpaceTest0065(void)
 {
-    return (AtGetHandleExceptionCommon(1, AE_BAD_CHARACTER));
+    return (AtGetHandleExceptionCommon(1, AE_NOT_FOUND));
 }
 
 /*
@@ -4414,7 +4448,7 @@ AtNSpaceTest0070(void)
 
     Status = AcpiGetHandle (NULL, "\\D1L1.D2L0.D3L0.D4L_.D5L0.L4__", &OutHandle);
 
-    if (Status != AE_NO_NAMESPACE)
+    if (Status != AE_NOT_FOUND)
     {
         AapiErrors++;
         printf ("AtGetHandleCommon: AcpiGetHandle() returned %s,"
@@ -4973,7 +5007,7 @@ AtGetNameExceptionCommon(
         return (Status);
     }
 
-    return (AtTerminateCtrlCheck(AE_OK, ALL_STAT));
+    return (AtTerminateCtrlCheck(AE_OK, ALL_STAT & ~FREE_STAT));
 }
 
 /*
@@ -5023,7 +5057,7 @@ AtNSpaceTest0079(void)
 ACPI_STATUS
 AtNSpaceTest0080(void)
 {
-    return (AtGetNameExceptionCommon(5, AE_NO_NAMESPACE));
+    return (AtGetNameExceptionCommon(5, AE_BAD_PARAMETER));
 }
 
 ACPI_STATUS
@@ -5232,8 +5266,6 @@ AtGetDevicesHandler (
     ACPI_BUFFER             OutName = {AT_PATHNAME_MAX, PathName};
     UINT32                  i;
 
-    ++GetDevicesHandlerCounter;
-
     Status = AcpiGetName (ObjHandle, ACPI_FULL_PATHNAME, &OutName);
 
     if (ACPI_FAILURE(Status))
@@ -5265,6 +5297,8 @@ AtGetDevicesHandler (
     {
         if (strcmp(GetDevicesHandlerContext.WalkInfo[i].PathName, PathName) == 0)
         {
+            ++GetDevicesHandlerCounter;
+
             GetDevicesHandlerContext.WalkInfo[i].WalkCount++;
             GetDevicesHandlerContext.WalkInfo[i].XfNestingLevel = NestingLevel;
             GetDevicesHandlerContext.WalkInfo[i].HandlerCount = GetDevicesHandlerCounter;
@@ -5385,7 +5419,7 @@ AtNSpaceTest0082(void)
         return (Status);
     }
 
-    Status = AtGetDevicesCommon("PCI\\VEN_ffff&DEV_dddd&SUBSYS_cccccccc&REV_01", AE_OK, AE_OK,
+    Status = AtGetDevicesCommon("PCI\\VEN_FFFF&DEV_DDDD&SUBSYS_CCCCCCCC&REV_01", AE_OK, AE_OK,
         sizeof (DeviceWalkInfoDev7) / sizeof (AT_WALK_INFO) + 1,
         sizeof (DeviceWalkInfoDev7) / sizeof (AT_WALK_INFO),
         DeviceWalkInfoDev7);
@@ -5648,6 +5682,12 @@ AtNSpaceTest0088(void)
 {
     ACPI_STATUS             Status;
 
+    TestSkipped++;
+    printf("Skip: AtNSpaceTest0088() AcpiGetDevices allow for some allocation"
+            " failure, it tries to walk through namespace as long as"
+            " possible\n");
+    return (AE_OK);
+
     if (ACPI_FAILURE(Status = AtAMLcodeFileNameSet("nmsp0000.aml")))
     {
         return (Status);
@@ -5731,10 +5771,6 @@ AttachDataHandler##Hid( \
     } \
     printf ("AttachDataHandler%d %d: Object 0x%p, Data  0x%p\n", \
             Hid, i, Object, Data); \
-    if (Hid == 1) \
-    { \
-        AcpiDetachData(Object, AttachDataHandler##Hid); \
-    } \
 }
 
 DEF_ATTACH_DATA_HANDLER(0)
@@ -5907,6 +5943,12 @@ AtAttachDataCommon(
                 AcpiFormatException(Status));
             return (Status);
         }
+        /*
+         * Wait till the other thread finish its job.
+         * XXX: pthread_join() should be called here instead. However, it
+         * require thread ID obtaining.
+         */
+        AcpiOsSleep(1000);
     }
 
     if ((UnloadFlag == 1) || (UnloadFlag == 3) || (UnloadFlag == 4))
@@ -6382,7 +6424,8 @@ AtDetachDataCommon(
 
     for (i = 0; i < DetachNumId; i++)
     {
-        Status = AcpiDetachData(Object, DetachHandlers[i]);
+        Status = AcpiDetachData(ExpectedStatus[i] != AE_BAD_PARAMETER?
+            Object : NULL, DetachHandlers[i]);
 
         if (Status != ExpectedStatus[i])
         {
@@ -6804,7 +6847,8 @@ AtGetDataCommon(
 
     for (i = 0; i < GetNumId; i++)
     {
-        Status = AcpiGetData(Object, GetHandlers[i], RetDataPointer);
+        Status = AcpiGetData(ExpectedStatus[i] != AE_BAD_PARAMETER ?
+            Object : NULL, GetHandlers[i], RetDataPointer);
 
         if (Status != ExpectedStatus[i])
         {
@@ -7132,7 +7176,8 @@ AtNSpaceTest0108(void)
 ACPI_STATUS
 AtNSpaceTest0110(void)
 {
-    void                    *Data[] = {DataBuffer + 1};
+    void                    *Data[] = {DataBuffer + 1, DataBuffer + 1,
+        DataBuffer + 1};
     UINT32                  HandlerId[] = {1};
     ACPI_OBJECT_HANDLER     Handlers[] = {AttachDataHandler1};
     UINT32                  DetachHandlerId[] = {0, 1, 2};
@@ -7160,8 +7205,6 @@ AtWalkNamespaceHandler (
     ACPI_STATUS             Status;
     ACPI_BUFFER             OutName = {AT_PATHNAME_MAX, PathName};
     UINT32                  i;
-
-    ++WalkNamespaceHandlerCounter;
 
     Status = AcpiGetName (ObjHandle, ACPI_FULL_PATHNAME, &OutName);
 
@@ -7197,6 +7240,8 @@ AtWalkNamespaceHandler (
     {
         if (strcmp(WalkNamespaceHandlerContext.WalkInfo[i].PathName, PathName) == 0)
         {
+            ++WalkNamespaceHandlerCounter;
+
             WalkNamespaceHandlerContext.WalkInfo[i].WalkCount++;
             WalkNamespaceHandlerContext.WalkInfo[i].XfNestingLevel = NestingLevel;
             WalkNamespaceHandlerContext.WalkInfo[i].HandlerCount =
@@ -7581,7 +7626,7 @@ AtNSpaceTest0118(void)
     ACPI_STATUS             Status;
     UINT32                  i;
 
-    for (i = ACPI_TYPE_EXTERNAL_MAX + 1; i < 20; i++)
+    for (i = ACPI_TYPE_LOCAL_MAX + 1; i < ACPI_TYPE_LOCAL_MAX + 4; i++)
     {
         Status = AtWalkNamespaceCommon(i,
             "\\D1L3", 1, 1,

@@ -138,6 +138,15 @@ typedef enum
     AtFixeReg_All,
 } AT_FIXED_REG_NUM;
 
+typedef struct acpi_os_queue ACPI_OSXF_QUEUE;
+
+typedef struct acpi_os_queue
+{
+    ACPI_OSXF_QUEUE *Next;
+    ACPI_OSXF_QUEUE *Prev;
+    void           *Addr;
+} ACPI_OSXF_QUEUE;
+
 #define MAX(a,b)             ((a) < (b))? (b) : (a)
 #define MIN(a,b)             ((a) < (b))? (a) : (b)
 
@@ -396,5 +405,14 @@ OsxfCtrlRegService(UINT32 ServiceFlag);
 UINT32
 OsxfCtrlRetError(
     ACPI_OSXF               OsxfNum);
+
+void
+OsxfCtrlAddQueue(void *Addr);
+
+BOOLEAN
+OsxfCtrlDelQueue(void *Addr);
+
+BOOLEAN
+OsxfCtrlCheckQueue(void *Addr);
 
 #endif /* _ATOSXFCTRL */

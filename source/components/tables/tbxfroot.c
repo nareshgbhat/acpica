@@ -212,6 +212,10 @@ AcpiFindRootPointer (
     ACPI_FUNCTION_TRACE (AcpiFindRootPointer);
 
 
+    if (!TableAddress)
+    {
+        return_ACPI_STATUS (AE_BAD_PARAMETER);
+    }
     /* 1a) Get the location of the Extended BIOS Data Area (EBDA) */
 
     TablePtr = AcpiOsMapMemory (

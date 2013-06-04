@@ -60,11 +60,6 @@ AtTableTest0000(void)
     ACPI_STATUS             Status;
     ACPI_STATUS             Benchmark = AE_BAD_PARAMETER;
 
-    if (AT_SKIP_FIND_ROOT_PPOINTER_CHECK) {
-        TestSkipped++;
-        printf ("Skip: AcpiFindRootPointer(NULL) results in a crash\n");
-        return (AE_OK);
-    }
     Status = AcpiFindRootPointer(NULL);
     if (Status != Benchmark)
     {
@@ -534,18 +529,6 @@ AtTableTest0008(void)
         return (AE_ERROR);
     }
 
-    /*
-     * Check the total number of AcpiOS* invocations
-     */
-    Status = OsxfCtrlCheck(TOTAL_STAT, 1);
-    if (ACPI_FAILURE(Status))
-    {
-        AapiErrors++;
-        printf ("API Error 2: AcpiOS* calls during AcpiInitializeTables, %s\n",
-            AcpiFormatException(Status));
-        return (Status);
-    }
-
     return (AE_OK);
 }
 
@@ -575,7 +558,13 @@ AtTableTest0009(void)
         return (Status);
     }
 
-    Status = AtInitializeTables(FALSE);
+    Status = AtInitCommonTest(AAPITS_INITIALIZE_SS, 0, 0, 0, 0, NULL);
+    if (ACPI_FAILURE(Status))
+    {
+        return (Status);
+    }
+
+    Status = AcpiInitializeTables(NULL, 20, FALSE);
     if (ACPI_FAILURE(Status))
     {
         AapiErrors++;
@@ -593,18 +582,6 @@ AtTableTest0009(void)
             AcpiFormatException(Status),
             AcpiFormatException(Benchmark));
         return (AE_ERROR);
-    }
-
-    /*
-     * Check the total number of AcpiOS* invocations
-     */
-    Status = OsxfCtrlCheck(TOTAL_STAT, 1);
-    if (ACPI_FAILURE(Status))
-    {
-        AapiErrors++;
-        printf ("API Error 2: AcpiOS* calls during AcpiInitializeTables, %s\n",
-            AcpiFormatException(Status));
-        return (Status);
     }
 
     return (AE_OK);
@@ -936,6 +913,14 @@ AtTableTest0016(void)
     ACPI_STATUS             Status;
     ACPI_TABLE_HEADER       UserTableStructure, *UserTable = &UserTableStructure;
 
+    Status = AtSubsystemInit(
+        (AAPITS_INI_PRELOAD & ~AAPITS_INITABLES),
+        0, 0, NULL);
+    if (ACPI_FAILURE(Status))
+    {
+        return (Status);
+    }
+
     memset(&UserTableStructure, 0, sizeof (ACPI_TABLE_HEADER));
 
     AtBuildLocalTables(UserTable, NullBldTask);
@@ -949,8 +934,7 @@ AtTableTest0016(void)
         return (Status);
     }
 
-    Status = AtSubsystemInit(
-        (AAPITS_INI_PRELOAD & ~AAPITS_INITABLES) | AAPITS_LOADTABLES,
+    Status = AtSubsystemInit(AAPITS_LOADTABLES,
         0, 0, NULL);
     if (ACPI_FAILURE(Status))
     {
@@ -1063,18 +1047,6 @@ AtLoadTablesInvalidTest(int Var)
                 i, AcpiFormatException(Status));
             return (AE_ERROR);
         }
-    }
-
-    /*
-     * Check the total number of AcpiOS* invocations
-     */
-    Status = OsxfCtrlCheck(TOTAL_STAT, 1);
-    if (ACPI_FAILURE(Status))
-    {
-        AapiErrors++;
-        printf ("API Error 4: AcpiOS* calls during AcpiLoadTables, %s\n",
-            AcpiFormatException(Status));
-        return (Status);
     }
 
     return (AE_OK);
@@ -1287,6 +1259,11 @@ AtTableTest0024(void)
     /* Skip a part of checks due to ignoring NS load errors for SSDT */
     UINT32                  TSkip[] = {7, 28};
 
+    TestSkipped++;
+    printf("Skip: AcpiTbLoadNamespace() allow for errors while loading tables,"
+            " it tries to get as many tables as possible\n");
+    return (AE_OK );
+
     /*
      * AcpiOsAllocate returns NULL permanently since the specified call
      */
@@ -1385,10 +1362,10 @@ AtTableTest0026(void)
         NULL_ADDRESS_FACS,
         NULL_ADDRESS_DSDT};
     ACPI_STATUS             ErrBenchmarks[] = {
-        AE_NO_ACPI_TABLES,
+            AE_OK,
 //        AE_NO_ACPI_TABLES,
-        AE_NO_ACPI_TABLES,
-        AE_NO_ACPI_TABLES};
+            AE_OK,
+            AE_OK};
 
     return (AtInitializeTablesErrTest(ErrFlags,
         (sizeof (ErrFlags) / sizeof (UINT32)),
@@ -1452,22 +1429,12 @@ AtLoadTablesErrTest(UINT32 *ErrFlags, int NumCases, ACPI_STATUS *ErrBenchmarks)
             }
 
             Status = AcpiLoadTables();
-            if (ACPI_FAILURE(Status))
-            {
-                AapiErrors++;
-                printf ("API Error: AcpiLoadTables() returned %s\n",
-                    AcpiFormatException(Status));
-                return (Status);
-            }
-
-            Status = AcpiEnableSubsystem(AAPITS_EN_FLAGS);
             if (Status != ErrBenchmarks[i])
             {
                 AapiErrors++;
-                printf ("API Error: AcpiEnableSubsystem() returned %s,"
-                    " expected %s\n",
-                    AcpiFormatException(Status),
-                    AcpiFormatException(ErrBenchmarks[i]));
+                printf("API Error: AcpiLoadTables() returned %s,"
+                        " expected %s\n", AcpiFormatException(Status),
+                        AcpiFormatException(ErrBenchmarks[i]));
                 return (AE_ERROR);
             }
         }
@@ -1525,8 +1492,8 @@ AtTableTest0028(void)
     ACPI_STATUS             ErrBenchmarks[] = {
         AE_OK,
         AE_OK,
-        AE_BAD_SIGNATURE,
-        AE_BAD_SIGNATURE};
+        AE_OK,
+        AE_OK};
 
     return (AtInitializeTablesErrTest(ErrFlags,
         (sizeof (ErrFlags) / sizeof (UINT32)),
@@ -1545,7 +1512,7 @@ AtTableTest0029(void)
         BAD_LENGTH_HDR_DSDT};
     ACPI_STATUS             ErrBenchmarks[] = {
         AE_BAD_HEADER,
-        AE_BAD_HEADER,
+        AE_OK,
         AE_BAD_HEADER};
 
     if (AT_SKIP_FADT_BAD_HEADER_CHECK)
@@ -1568,9 +1535,9 @@ AtTableTest0030(void)
         BAD_LENGTH_DSC_FADT,
         BAD_LENGTH_DSC_FACS};
     ACPI_STATUS             ErrBenchmarks[] = {
-        AE_NOT_FOUND,
-        AE_INVALID_TABLE_LENGTH,
-        AE_INVALID_TABLE_LENGTH};
+        AE_OK,
+        AE_OK,
+        AE_OK};
 
     return (AtLoadTablesErrTest(ErrFlags,
         (sizeof (ErrFlags) / sizeof (UINT32)),
@@ -3196,23 +3163,15 @@ AtTableTest0060(void)
         return (Status);
     }
 
-    free(UserTable);
+    AcpiTbInstallTable((ACPI_PHYSICAL_ADDRESS) UserTable, NULL, AcpiGbl_RootTableList.CurrentTableCount++);
 
     /* Caller should unmap the header with AcpiOsUnmapMemory */
-    Status = AcpiGetTableHeader(ACPI_SIG_DSDT, 1,
+    Status = AcpiGetTableHeader(ACPI_SIG_DSDT, 2,
         &OutTableHeader2);
     if (ACPI_FAILURE(Status))
     {
         AapiErrors++;
         printf ("API Error: AcpiGetTableHeader(DSDT, 1) returned %s\n",
-            AcpiFormatException(Status));
-        return (Status);
-    }
-    Status = AtReadTableFromFile (AtAMLcodeFileName, &UserTable);
-    if (ACPI_FAILURE(Status))
-    {
-        TestErrors++;
-        printf ("Test error: AtReadTableFromFile(DSDT) failure, %s\n",
             AcpiFormatException(Status));
         return (Status);
     }

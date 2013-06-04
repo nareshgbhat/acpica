@@ -253,11 +253,16 @@ AcpiUtDeleteCaches (
 
     /* Free memory lists */
 
-    AcpiOsFree (AcpiGbl_GlobalList);
-    AcpiGbl_GlobalList = NULL;
-
-    AcpiOsFree (AcpiGbl_NsNodeList);
-    AcpiGbl_NsNodeList = NULL;
+    if (AcpiGbl_GlobalList)
+    {
+        AcpiOsFree (AcpiGbl_GlobalList);
+        AcpiGbl_GlobalList = NULL;
+    }
+    if (AcpiGbl_NsNodeList)
+    {
+        AcpiOsFree (AcpiGbl_NsNodeList);
+        AcpiGbl_NsNodeList = NULL;
+    }
 #endif
 
     return (AE_OK);
