@@ -121,6 +121,7 @@ SRCS=	atexec.c atmain.c \
 	../../source/components/parser/psxface.c \
 	../../source/components/namespace/nsaccess.c \
 	../../source/components/namespace/nsalloc.c \
+	../../source/components/namespace/nsarguments.c \
 	../../source/components/namespace/nsconvert.c \
 	../../source/components/namespace/nsdump.c \
 	../../source/components/namespace/nsdumpdv.c \
@@ -157,17 +158,20 @@ SRCS=	atexec.c atmain.c \
 	../../source/components/tables/tbfadt.c \
 	../../source/components/tables/tbfind.c \
 	../../source/components/tables/tbinstal.c \
+	../../source/components/tables/tbprint.c \
 	../../source/components/tables/tbutils.c \
 	../../source/components/tables/tbxface.c \
 	../../source/components/tables/tbxfload.c \
 	../../source/components/tables/tbxfroot.c \
 	../../source/components/utilities/utaddress.c \
 	../../source/components/utilities/utalloc.c \
+	../../source/components/utilities/utbuffer.c \
 	../../source/components/utilities/utcache.c \
 	../../source/components/utilities/utcopy.c \
 	../../source/components/utilities/utdebug.c \
 	../../source/components/utilities/utdecode.c \
 	../../source/components/utilities/utdelete.c \
+	../../source/components/utilities/uterror.c \
 	../../source/components/utilities/uteval.c \
 	../../source/components/utilities/utexcep.c \
 	../../source/components/utilities/utglobal.c \
@@ -200,11 +204,7 @@ acpiexec : $(patsubst %.c,%.o, $(SRCS))
 	$(CC) $(LDFLAGS) $(patsubst %.c,%.o, $(SRCS)) -o $(PROG)
 
 aml:
-	@if [ $(findstring 64,$(HARDWARE_NAME)) ]; then \
-	make -C asl ASL=../../../${BUILD_DIRECTORY_PATH}/bin64/iasl; \
-	else \
-	make -C asl ASL=../../../${BUILD_DIRECTORY_PATH}/bin32/iasl; \
-	fi;
+	make -C asl ASL=../../../${BUILD_DIRECTORY_PATH}/bin/iasl
 
 all: acpiexec aml
 
